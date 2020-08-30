@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>神魔之塔卡片 API DEMO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <div class="">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="./">神魔之塔卡片 API DEMO</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1" aria-controls="navbar1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar1">
+                <ul class="navbar-nav mr-auto">
+                </ul>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="form">
+                <fieldset>
+                    <legend>神魔之塔卡片 API DEMO</legend>
+                    <p>非官方卡片資訊 API</p>
+                    <div class="form-group">
+                        <label for="id">卡片 ID (必須)</label>
+                        <input type="number" class="form-control" id="id" placeholder="卡片 ID (必須)" value="2454">
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="minify">
+                            <label class="custom-control-label" for="minify">是否去除縮排以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="noskills">
+                            <label class="custom-control-label" for="noskills">是否去除技能資訊以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="noinfo">
+                            <label class="custom-control-label" for="noinfo">是否去除額外資訊以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="nostory">
+                            <label class="custom-control-label" for="nostory">是否去除卡片故事以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="notable">
+                            <label class="custom-control-label" for="notable">是否去除卡片各數值表以減少資料大小 (可選)</label>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="get()">測試</button>
+                </fieldset>
+            </div>
+            <div>
+                <br>
+                <code id="result">尚未進行測試</code>
+            </div>
+        </div>
+        <!-- Main Body End -->
+    </div>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/pascal-the-elf/TOS-CARD-API@latest/js/tos_card.min.js"></script>
+
+    <script>
+        function get() {
+            fetch("https://tos-card-api.pascaltheelf.workers.dev/?id="+document.getElementById("id").value+build_options()).then(r=>r.text()).then(resp => {
+                document.getElementById("result").innerHTML = resp;
+            });
+        }
+        function build_options() {
+            var built = "";
+            Object.entries({
+                minify: document.getElementById("minify").checked,
+                noskills: document.getElementById("noskills").checked,
+                noinfo: document.getElementById("noinfo").checked,
+                nostory: document.getElementById("nostory").checked,
+                notable: document.getElementById("notable").checked
+            }).forEach(item => {
+                built += item[1] ? `&${item[0]}` : "";
+            });
+            return built;
+        }
+    </script>
+</body>
+</html>

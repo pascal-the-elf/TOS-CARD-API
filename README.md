@@ -41,3 +41,5 @@ fetch("https://tos-card-api.pascaltheelf.workers.dev/?id=2454").then(r=>r.json()
     document.body.innerHTML += `<pre>${resp.data}</pre>`;
 });
 ```
+## 測試 DEMO
+[前往 DEMO 網站](https://pascal-the-elf.github.io/TOS-CARD-API/demo)
