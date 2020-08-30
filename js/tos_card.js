@@ -47,7 +47,7 @@ function tos_card() {
     self.build_options = function(options) {
         var built = "";
         Object.entries(options).forEach(item => {
-            built += item[1] ? `&${item[0]}` : "";
+            built += item[1] ? `&${item[0]}=${item[1]}` : "";
         });
         return built;
     };

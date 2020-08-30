@@ -82,7 +82,7 @@
                 nostory: document.getElementById("nostory").checked,
                 notable: document.getElementById("notable").checked
             }).forEach(item => {
-                built += item[1] ? `&${item[0]}` : "";
+                built += item[1] ? `&${item[0]}=${item[1]}` : "";
             });
             return built;
         }
