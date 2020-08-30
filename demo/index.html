@@ -49,13 +49,15 @@
                             <label class="custom-control-label" for="notable">是否去除卡片各數值表以減少資料大小 (可選)</label>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="get()">測試</button>
+                    <button type="button" class="btn btn-primary" onclick="window.open(`https://tos-card-api.pascaltheelf.workers.dev/?id=`+document.getElementById('id').value+build_options(), '_blank')">測試</button>
                 </fieldset>
             </div>
+            <!--
             <div>
                 <br>
                 <code id="result">尚未進行測試</code>
             </div>
+            -->
         </div>
         <!-- Main Body End -->
     </div>
@@ -64,8 +66,6 @@
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-
-    <script src="https://cdn.jsdelivr.net/gh/pascal-the-elf/TOS-CARD-API@latest/js/tos_card.min.js"></script>
 
     <script>
         function get() {
