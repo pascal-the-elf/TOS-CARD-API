@@ -4,6 +4,11 @@
     <title>神魔之塔卡片 API DEMO</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 </head>
 <body>
     <div class="">
@@ -24,12 +29,13 @@
         <div class="container">
             <div class="form">
                 <fieldset style="font-size: 1rem;">
-                    <legend><h1 style="font-size: 2rem;">神魔之塔卡片 API DEMO</h1></legend>
+                    <legend><h1 style="font-size: 2rem; margin-top: 0.5rem;">神魔之塔卡片 API DEMO</h1></legend>
                     <h2 style="font-size: 1.3rem;">非官方卡片資訊 API</h2>
                     <br>
                     <div class="form-group">
-                        <label for="id">卡片 ID (必須)</label>
-                        <input type="number" class="form-control" id="id" placeholder="卡片 ID (必須)" value="2454">
+                        <label for="id" style="margin-bottom: 0;">卡片 ID (必須)</label>
+                        <small id="id_help" class="form-text text-muted">支援多卡查詢，使用「,」分隔卡片 ID，一次最多 6 張</small>
+                        <input type="text" class="form-control" id="id" placeholder="卡片 ID (必須)" value="1,5,9,13,17">
                     </div>
                     <div class="form-group">
                         <div class="custom-control custom-checkbox">
@@ -53,7 +59,7 @@
                             <label class="custom-control-label" for="notable">是否去除卡片各數值表以減少資料大小 (可選)</label>
                         </div>
                     </div>
-                    <button id="get" type="button" class="btn btn-primary" onclick="get()" disabled>測試</button>
+                    <button id="get" type="button" class="btn btn-primary" onclick="get()" disabled>載入中</button>
                 </fieldset>
             </div>
 
@@ -71,11 +77,6 @@
         <!-- Main Body End -->
     </div>
 
-    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-
     <script>
 
     (function(){
@@ -83,6 +84,7 @@
         fetch("https://tos-card-api.pascaltheelf.workers.dev/?id=1").then(r=>r.json()).then(j=>{
             console.log("TEST", j);
             document.getElementById("get").disabled = false;
+            document.getElementById("get").innerHTML = "測試";
         });
     })();
 
