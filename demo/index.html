@@ -23,9 +23,10 @@
         </nav>
         <div class="container">
             <div class="form">
-                <fieldset>
-                    <legend>神魔之塔卡片 API DEMO</legend>
-                    <p>非官方卡片資訊 API</p>
+                <fieldset style="font-size: 1rem;">
+                    <legend><h1 style="font-size: 2rem;">神魔之塔卡片 API DEMO</h1></legend>
+                    <h2 style="font-size: 1.3rem;">非官方卡片資訊 API</h2>
+                    <br>
                     <div class="form-group">
                         <label for="id">卡片 ID (必須)</label>
                         <input type="number" class="form-control" id="id" placeholder="卡片 ID (必須)" value="2454">
@@ -52,13 +53,17 @@
                             <label class="custom-control-label" for="notable">是否去除卡片各數值表以減少資料大小 (可選)</label>
                         </div>
                     </div>
-                    <button id="get" type="button" class="btn btn-primary" onclick="get()">測試</button>
+                    <button id="get" type="button" class="btn btn-primary" onclick="get()" disabled>測試</button>
                 </fieldset>
             </div>
 
             <div>
                 <br>
-                <code id="result" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;">尚未進行測試</code>
+                <h3 style="font-size: 1.3rem;">請求資訊</h3>
+                <code id="request" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;">尚未進行測試</code>
+                <br>
+                <h3 style="font-size: 1.3rem;">回應資訊</h3>
+                <code id="response" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;">尚未進行測試</code>
                 <br>
             </div>
 
@@ -72,11 +77,24 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 
     <script>
+
+    (function(){
+        Swal.fire("神魔之塔卡片 API","DEMO 網站","info");
+        fetch("https://tos-card-api.pascaltheelf.workers.dev/?id=1").then(r=>r.json()).then(j=>{
+            console.log("TEST", j);
+            document.getElementById("get").disabled = false;
+        });
+    })();
+
     function get() {
         document.getElementById("get").disabled = true;
-        document.getElementById("result").innerHTML = "測試中...";
-        fetch("https://tos-card-api.pascaltheelf.workers.dev/?id="+document.getElementById("id").value+build_options()).then(r=>r.text()).then(resp => {
-            document.getElementById("result").innerHTML = resp;
+        var url = "https://tos-card-api.pascaltheelf.workers.dev/?id="+document.getElementById("id").value+build_options();
+        var time_a = Date.now();
+        document.getElementById("request").innerHTML = `請求的資源位址：${url}\n開始時間：${new Date().toString()}\n`;
+        document.getElementById("response").innerHTML = "測試中...";
+        fetch(url).then(r=>r.text()).then(resp => {
+            document.getElementById("request").innerHTML += `結束時間：${new Date().toString()}\n耗時：${parseInt((Date.now()-time_a)/10)/100} 秒\n`;
+            document.getElementById("response").innerHTML = resp;
             document.getElementById("get").disabled = false;
         });
     }
