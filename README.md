@@ -55,7 +55,7 @@ fetch("https://tos-card-api.pascaltheelf.workers.dev/?id=2454").then(r=>r.json()
 
 ### 請求參數
 ```javascript
-var request_url = "https://tos-card-api.pascaltheelf.workers.dev/" + 
+var request_url = "https://tos-card-api.pascaltheelf.workers.dev/" +
                     "?id=2454,2455" + /* 卡片 ID (必須) */
                     "$minify=false" + /* 是否去除縮排以減少資料大小 (可選) */
                     "&noskills=false" + /* 是否去除技能資訊以減少資料大小 (可選) */
@@ -67,124 +67,120 @@ var request_url = "https://tos-card-api.pascaltheelf.workers.dev/" +
 ```javascript
 {
     "info": {
-        "success": true,                    /* 請求成功與否 */
-        "msg": "此 API 還在測試中，如果遇到任何問題，請至 https://github.com/pascal-the-elf/TOS-CARD-API/issues 提出。", /* 一些提醒 */
+        "success": boolean,                 /* 請求成功與否 */
+        "msg": string,                      /* 一些提醒 */
         "parameters": {                     /* 請求執行的參數 */
             "id": [
-                2454,
-                2455
+                integer,
+                integer
             ],
-            "minify": false,
-            "noskills": false,
-            "noinfo": false,
-            "nostory": false,
-            "notable": false
+            "minify": boolean,
+            "noskills": boolean,
+            "noinfo": boolean,
+            "nostory": boolean,
+            "notable": boolean
         },
-        "version": "1.1.0"                  /* API 版本 */
+        "version": string                   /* API 版本 */
     },
     "cards": {                              /* 查詢的資料 */
         "2454": {                           /* 查詢的卡片 */
-            "id": 2454,                     /* 卡片 ID */
-            "name": "憤怒之罪 ‧ 梅里奧達斯",   /* 卡片名稱 */
-            "attribute": "暗",               /* 卡片屬性 */
-            "race": "魔族",                  /* 卡片種族 */
-            "rarity": 6,                    /* 卡片稀有度 */
-            "cost": 14,                     /* 卡片空間 */
-            "series": "眾神的逆鱗",          /* 卡片系列名稱 */
+            "id": integer,                  /* 卡片 ID */
+            "name": string,                 /* 卡片名稱 */
+            "attribute": string,            /* 卡片屬性 */
+            "race": string,                 /* 卡片種族 */
+            "rarity": integer,              /* 卡片稀有度 */
+            "cost": integer,                /* 卡片空間 */
+            "series": string,               /* 卡片系列名稱 */
             "stats": {                      /* 卡片初等數值 */
-                "hp": 878,
-                "attack": 1231,
-                "recovery": 68
+                "hp": integer,
+                "attack": integer,
+                "recovery": integer
             },
             "stats_max": {                  /* 卡片滿等數值 */
-                "hp": 2007,
-                "attack": 2687,
-                "recovery": 407
+                "hp": integer,
+                "attack": integer,
+                "recovery": integer
             },
             "skills": {                     /* 卡片技能 */
                 "active": [                 /* 卡片主動技 */
                     {
-                        "name": "全反擊",
-                        "effect": "1 回合內\nI. 自身不能發動攻擊\nII. 所受傷害不會使你死亡\n(包括「喋血屠刀」、「一擊必殺」等\n扣除召喚師指定 % 生命力的敵技\n所造成的傷害)\nIII. 以所受傷害 1000 倍\n⇒ 對敵方攻擊者進行\n相剋屬性反擊\n(此傷害無視防禦力及\n「強化突破」敵技)\nIV. 下回合，將本回合\n所受傷害的 3 倍\n⇒ 加至自身攻擊力\n⇒ 最多加至 32500",
-                        "cd": {
-                            "max": 18,
-                            "min": 7
+                        "name": string,     /* 卡片主動技 1 名稱 */
+                        "effect": string,   /* 卡片主動技 1 效果 */
+                        "cd": {             /* 如果是 ep 技會用 "ep" 代替 */
+                            "max": integer, /* 卡片主動技 1 最大 CD/EP */
+                            "min": integer  /* 卡片主動技 1 最小 CD/EP */
                         }
                     },
                     {
-                        "name": "變身",
-                        "effect": "I. 變身\nII. 引爆心符石\n⇒ 掉落暗魔族強化符石\n2 回合內\nIII. 心符石的掉落率降至 0\nIV. 將原有機率增加至\n⇒ 暗符石的掉落率\nV. 將掉落的暗符石\n⇒ 以暗魔族強化符石代替\nVI. 魔族攻擊力及回復力 1.7 倍",
-                        "switch": 2455,
-                        "cd": {
-                            "max": 18,
-                            "min": 7
+                        "name": string,     /* 卡片主動技 2 名稱 */
+                        "effect": string,   /* 卡片主動技 2 效果 */
+                        "switch": integer,  /* 卡片主動技 2 變身目標 ID (如果技 2 為變身才有) */
+                        "cd": {             /* 如果是 ep 技會用 "ep" 代替 */
+                            "max": integer, /* 卡片主動技 2 最大 CD/EP */
+                            "min": integer  /* 卡片主動技 2 最小 CD/EP */
                         }
                     }
                 ],
                 "leader": [                 /* 卡片隊長技 */
                     {
-                        "name": "支配憤怒",
-                        "effect": "隊伍中只有人類、妖精類、魔族或\n「最高神的女兒 ‧ 伊麗莎白」時：\nI. 全隊攻擊力 7 倍、\n生命力及回復力 1.5 倍\nII. 暗符石兼具 50% 其他符石效果\nIII. 以所受傷害 700 倍\n⇒ 對敵方進行相剋屬性反擊\n(此傷害無視防禦力及「強化突破」敵技)\nIV. 達成 ≥7 連擊 (Combo)\n⇒ 全隊攻擊力額外 1.7 倍"
+                        "name": string,     /* 卡片隊長技 名稱 */
+                        "effect": string    /* 卡片隊長技 效果 */
                     }
                 ],
                 "team": [                   /* 卡片隊伍技 */
                     {
-                        "effect": "I. 必然延長移動符石時間 2 秒\nII. 「七大罪」\n⇒ 生命力、攻擊力、回復力 1.2 倍\nIII. 將移動符石時觸碰的符石\n⇒ 轉化為強化符石\nIV. 其他屬性符石\n⇒ 兼具 50% 暗符石效果\nV. 每消除 2 連擊 (Combo)\n⇒ 額外計算多 1 連擊 (Combo)",
-                        "condition": "以「憤怒之罪 ‧ 梅里奧達斯」\n作隊長及戰友；或\n以「憤怒之罪 ‧ 梅里奧達斯」及\n「魔神化 ‧ 梅里奧達斯」作隊長及戰友"
+                        "effect": string,   /* 卡片隊伍技 效果 */
+                        "condition": string /* 卡片隊伍技 條件 */
                     },
                     {
-                        "effect": "最左方的「看板娘 ‧ 伊麗莎白」及\n最左方的「憤怒之罪 ‧ 梅里奧達斯」\n⇒ 生命力、攻擊力、回復力 1.5 倍",
-                        "condition": "以「憤怒之罪 ‧ 梅里奧達斯」\n及「看板娘 ‧ 伊麗莎白」作成員"
-                    },
-                    {
-                        "effect": "＊此召喚獸於 CD 0 時可以變身，變身後將以消耗能量點的方式發動技能。召喚獸的技能等級愈高，發動技能時所需的能量值愈低。\n變身時，能量點為全滿狀態 (20 點)；當能量點未滿時，可以於 1 回合內消除 5 粒或以上的暗符石，以儲存 1 點能量點。",
-                        "condition": null
+                        "effect": string,   /* 卡片隊伍技 效果 */
+                        "condition": string /* 卡片隊伍技 條件（如果效果為變身或合體敘述則為 null） */
                     }
                 ]
             },
-            "info": "【眾神的逆鱗】\n\nCV：梶裕貴\n\n「眾神的逆鱗」系列練技素材：\n- ID 2462 霍克\n- ID 2471 紅色魔神\n- ID 2472 灰色魔神", /* 卡片額外資訊 */
-            "story": "背負七大罪的「憤怒之罪」、「七大罪」的團長，也是移動酒館「豬帽子亭」的店長。外表是名少年，實際的身份是「七大罪」的團長。", /* 卡片故事 */
+            "info": string,                 /* 卡片額外資訊 */
+            "story": string,                /* 卡片故事 */
             "table": [                      /* 卡片各等級數值表：table[n] 為 n等的數值 */
                 null,
                 {
-                    "hp": 878,              /* 卡片各等級生命力 */
-                    "attack": 1231,         /* 卡片各等級攻擊力 */
-                    "recovery": 68,         /* 卡片各等級回復力 */
-                    "levelup_exp": 521,     /* 卡片各等級升級所需經驗值（升至下一級） */
-                    "total_exp": 0,         /* 卡片各等級累積經驗值 */
-                    "exp": 1200,            /* 卡片各等級拿去餵的經驗值 */
-                    "sell": 6000            /* 卡片各等級分解的價值 */
+                    "hp": integer,              /* 卡片各等級生命力 */
+                    "attack": integer,         /* 卡片各等級攻擊力 */
+                    "recovery": integer,         /* 卡片各等級回復力 */
+                    "levelup_exp": integer,     /* 卡片各等級升級所需經驗值（升至下一級） */
+                    "total_exp": integer,         /* 卡片各等級累積經驗值 */
+                    "exp": integer,            /* 卡片各等級拿去餵的經驗值 */
+                    "sell": integer            /* 卡片各等級分解的價值 */
                 },
                 {
-                    "hp": 890,
-                    "attack": 1246,
-                    "recovery": 71,
-                    "levelup_exp": 1562,
-                    "total_exp": 521,
-                    "exp": 2200,
-                    "sell": 6100
+                    "hp": integer,
+                    "attack": integer,
+                    "recovery": integer,
+                    "levelup_exp": integer,
+                    "total_exp": integer,
+                    "exp": integer,
+                    "sell": integer
                 },
                 {
                     "因為太長了": "所以中間省略",
                     "真正的請求不會省略": "請放心"
                 },
                 {
-                    "hp": 1995,
-                    "attack": 2672,
-                    "recovery": 403,
-                    "levelup_exp": 101520,
-                    "total_exp": 4898480,
-                    "exp": 98200,
-                    "sell": 15700
+                    "hp": integer,
+                    "attack": integer,
+                    "recovery": integer,
+                    "levelup_exp": integer,
+                    "total_exp": integer,
+                    "exp": integer,
+                    "sell": integer
                 },
                 {
-                    "hp": 2007,
-                    "attack": 2687,
-                    "recovery": 407,
-                    "levelup_exp": 102562,
-                    "total_exp": 5000000,
-                    "exp": 99200,
-                    "sell": 15800
+                    "hp": integer,
+                    "attack": integer,
+                    "recovery": integer,
+                    "levelup_exp": integer,
+                    "total_exp": integer,
+                    "exp": integer,
+                    "sell": integer
                 }
             ]
         },
@@ -309,8 +305,8 @@ var options = {
     notable: false
 };
 
-card.get(card_id, options).then(console.log); 
-/* 
+card.get(card_id, options).then(console.log);
+/*
     card_id: 可為 number, string, array(上限6項)
     options: 非必要，object
 */
