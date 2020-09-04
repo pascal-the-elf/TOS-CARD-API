@@ -293,6 +293,10 @@ var request_url = "https://tos-card-api.pascaltheelf.workers.dev/" +
 ```
 <a name="link_tos_card_js"></a>
 ## Javascript Client - TOS_CARD.JS
+
+CDN：
+- [jsDelivr CDN](https://cdn.jsdelivr.net/gh/pascal-the-elf/TOS-CARD-API@latest/js/tos_card.min.js)
+
 ```javascript
 var card = new tos_card();
 
