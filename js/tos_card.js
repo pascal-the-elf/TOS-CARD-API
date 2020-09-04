@@ -37,16 +37,20 @@ function tos_card() {
                 console.log("成功向 API 請求資料", response);
                 if(self.settings.cache) {
                     console.log("已啟用快取功能，寫入快取資料");
-                    var storage = JSON.parse(localStorage[self.settings.cache_name]);
                     Object.entries(response.cards).forEach(card => {
-                        storage[card[0]] = {
-                            options: Object.values(options).map(x=>x?1:0).join("").substr(1),
-                            time: Date.now(),
-                            card: card[1]
-                        };
+                        new Promise((ok, reject) => {
+                            var c = {
+                                id: card[0],
+                                options: Object.values(options).map(x=>x?1:0).join("").substr(1),
+                                time: Date.now(),
+                                card: card[1]
+                            };
+                            var trx = self.db.transaction("cards", "readwrite");
+                            var store = trx.objectStore("cards");
+                            var r = store.add(c);
+                            r.onsuccess = function() { ok(c) };
+                        }).then(rsp => {rsp ? console.log("已寫入快取資料", rsp) : console.error("寫入快取資料失敗")});
                     });
-                    localStorage[self.settings.cache_name] = JSON.stringify(storage);
-                    console.log("已寫入快取資料", storage);
                 }
                 Object.entries(response.cards).forEach(card => { cards[card[0]] = card[1] });
                 console.log("回傳卡片資料");
@@ -59,12 +63,18 @@ function tos_card() {
             console.error("沒有提供卡片ID");
             return;
         }
-        if(!localStorage[self.settings.cache_name]) localStorage[self.settings.cache_name] = `{}`;
-        var storage = JSON.parse(localStorage[self.settings.cache_name]);
+        var trx = self.db.transaction("cards", "readwrite");
+        var store = trx.objectStore("cards");
 
         var request = [], local = [];
         for(let i = 0; i < id.length; i++) {
-            let cached = storage[id[i]];
+            let cached = await new Promise((ok, reject)=>{
+                let r = store.get(id[i]);
+                r.onsuccess = function() {
+                    ok(r.result);
+                };
+            });
+
             if(cached && cached.options === Object.values(options).map(x=>x?1:0).join("").substr(1) && cached.time + self.settings.cache_time >= Date.now()) {
                 console.log(`已取得符合 No.${id[i]} 的快取資料，使用快取資料`);
                 local.push([id[i],cached.card]);
@@ -77,7 +87,7 @@ function tos_card() {
         return {request, local};
     };
     self.clear_cache = function() {
-        localStorage[self.settings.cache_name] = `{}`;
+        indexedDB.deleteDatabase(self.settings.cache_name);
         console.log("已清除快取資料");
     };
     self.build_options = function(options) {
@@ -86,6 +96,31 @@ function tos_card() {
             built += item[1] ? `&${item[0]}=${item[1]}` : "";
         });
         return built;
+    };
+    self.build_db = function() {
+        if(!self.db) self.db = {};
+        if(!self.db.request) self.db.request = indexedDB.open(self.settings.cache_name, 1);
+        self.db.request.onsuccess = function () {
+            self.db = self.db.request.result;
+            console.log("本地資料庫已連接");
+        };
+        self.db.request.onupgradeneeded = function (evt) {
+            var store = evt.currentTarget.result.createObjectStore("cards", { keyPath: "id" });
+
+            store.createIndex("card", "card", { unique: false });
+            store.createIndex("options", "options", { unique: false });
+            store.createIndex("time", "time", { unique: false });
+            console.log("本地資料庫升級完成");
+        };
+    }
+    self.check = function() {
+        if (!window.indexedDB) {
+            self.settings.cache = false;
+            console.log("瀏覽器不支援 indexedDB，已關閉快取功能");
+        }
+        else {
+            self.build_db();
+        }
     };
     self.settings = {
         cache: true,
@@ -99,4 +134,5 @@ function tos_card() {
             notable: false
         }
     };
+    self.check();
 }
