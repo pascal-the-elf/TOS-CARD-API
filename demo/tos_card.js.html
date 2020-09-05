@@ -72,7 +72,7 @@
             <div>
                 <br>
                 <h3 style="font-size: 1.3rem;">控制台輸出資訊</h3>
-                <code id="console" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;">尚未進行測試</code>
+                <code id="console" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;"></code>
                 <br>
                 <h3 style="font-size: 1.3rem;">JS Client 回應資訊</h3>
                 <code id="response" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;">尚未進行測試</code>
@@ -90,8 +90,6 @@
         document.getElementById("get").disabled = false;
         document.getElementById("get").innerHTML = "測試";
     })();
-    
-    var first = true;
         
     window.console.log = function(...args) {
         for(let i = 0; i < args.length; i++) {
@@ -107,10 +105,6 @@
     var card = new tos_card();
     
     function get() {
-        if(first) { 
-            document.getElementById("console").innerHTML = "";
-            first = false;
-        }
         document.getElementById("get").disabled = true;
         document.getElementById("response").innerHTML = "測試中...";
         card.get(document.getElementById("id").replace(/^\s+|\s+$/g, "").split(","), build_options()).then(resp => {
