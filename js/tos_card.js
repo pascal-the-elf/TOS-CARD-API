@@ -49,7 +49,9 @@ function tos_card() {
                             var store = trx.objectStore("cards");
                             var r = store.add(c);
                             r.onsuccess = function() { ok(c) };
-                        }).then(rsp => {rsp ? console.log("已寫入快取資料", rsp) : console.error("寫入快取資料失敗")});
+                        })
+                        .then(rsp => {rsp ? console.log("已寫入快取資料", rsp) : console.error("寫入快取資料失敗")})
+                        .catch(err => {console.error("寫入快取資料失敗")});
                     });
                 }
                 Object.entries(response.cards).forEach(card => { cards[card[0]] = card[1] });
@@ -75,7 +77,7 @@ function tos_card() {
                 };
             });
 
-            if(cached && cached.options === Object.values(options).map(x=>x?1:0).join("").substr(1) && cached.time + self.settings.cache_time >= Date.now()) {
+            if(cached && cached.options === Object.values(options).map(x=>x?1:0).join("").substr(1) && cached.time + self.settings.cache_time >= Date.now() && cached.card != null) {
                 console.log(`已取得符合 No.${id[i]} 的快取資料，使用快取資料`);
                 local.push([id[i],cached.card]);
             }
