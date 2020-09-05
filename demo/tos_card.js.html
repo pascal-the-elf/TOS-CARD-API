@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>神魔之塔卡片 API DEMO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+    <div class="">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="./">神魔之塔卡片 API DEMO</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1" aria-controls="navbar1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar1">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./">API DEMO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./tos_card.js">JS Client DEMO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/pascal-the-elf/TOS-CARD-API" target="_blank">GitHub</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="form">
+                <fieldset style="font-size: 1rem;">
+                    <legend><h1 style="font-size: 2rem; margin-top: 0.5rem;">神魔之塔卡片 API <br>JS Client DEMO</h1></legend>
+                    <h2 style="font-size: 1.3rem;">非官方卡片資訊 API</h2>
+                    <br>
+                    <div class="form-group">
+                        <label for="id" style="margin-bottom: 0;">卡片 ID (必須)</label>
+                        <small id="id_help" class="form-text text-muted">支援多卡查詢，使用「,」分隔卡片 ID，一次最多 6 張</small>
+                        <input type="text" class="form-control" id="id" placeholder="卡片 ID (必須)" value="1,5,9,13,17">
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="minify">
+                            <label class="custom-control-label" for="minify">是否去除縮排以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="noskills">
+                            <label class="custom-control-label" for="noskills">是否去除技能資訊以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="noinfo">
+                            <label class="custom-control-label" for="noinfo">是否去除額外資訊以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="nostory">
+                            <label class="custom-control-label" for="nostory">是否去除卡片故事以減少資料大小 (可選)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="notable">
+                            <label class="custom-control-label" for="notable">是否去除卡片各數值表以減少資料大小 (可選)</label>
+                        </div>
+                    </div>
+                    <button id="get" type="button" class="btn btn-primary" onclick="get()" disabled>載入中</button>
+                </fieldset>
+            </div>
+
+            <div>
+                <br>
+                <h3 style="font-size: 1.3rem;">控制台輸出資訊</h3>
+                <code id="console" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;">尚未進行測試</code>
+                <br>
+                <h3 style="font-size: 1.3rem;">JS Client 回應資訊</h3>
+                <code id="response" style="display: block; width: 100%; min-height: 120px; padding: 8px; white-space: pre-wrap; border:1px solid #ced4da; border-radius: 5px;">尚未進行測試</code>
+                <br>
+            </div>
+
+        </div>
+        <!-- Main Body End -->
+    </div>
+    
+    <scipt src="https://cdn.jsdelivr.net/gh/pascal-the-elf/TOS-CARD-API@latest/js/tos_card.min.js"></script>
+    <script>
+
+    (function(){
+        document.getElementById("get").disabled = false;
+        document.getElementById("get").innerHTML = "測試";
+    })();
+    
+    window.console.log = function(...args) {
+        for(let i = 0; i < args.length; i++) {
+            document.getElementById("console").innerHTML += "[Info] " + args[i] + "\n";
+        }
+    };
+    window.console.error = function(...args) {
+        for(let i = 0; i < args.length; i++) {
+            document.getElementById("console").innerHTML += "[Error] " + args[i] + "\n";
+        }
+    };
+    
+    var card = new tos_card();
+    
+    function get() {
+        document.getElementById("get").disabled = true;
+        document.getElementById("response").innerHTML = "測試中...";
+        card.get(document.getElementById("id").replace(/^\s+|\s+$/g, "").split(","), build_options()).then(resp => {
+            document.getElementById("response").innerHTML = JSON.stringify(resp, null, 4);
+            document.getElementById("console").innerHTML += "\n";
+            document.getElementById("get").disabled = false;
+        });
+    }
+    function build_options() {
+        return {
+            minify: document.getElementById("minify").checked,
+            noskills: document.getElementById("noskills").checked,
+            noinfo: document.getElementById("noinfo").checked,
+            nostory: document.getElementById("nostory").checked,
+            notable: document.getElementById("notable").checked
+        };
+    }
+    </script>
+</body>
+</html>
