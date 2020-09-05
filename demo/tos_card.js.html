@@ -107,7 +107,7 @@
     function get() {
         document.getElementById("get").disabled = true;
         document.getElementById("response").innerHTML = "測試中...";
-        card.get(document.getElementById("id").replace(/^\s+|\s+$/g, "").split(","), build_options()).then(resp => {
+        card.get(document.getElementById("id").value.replace(/^\s+|\s+$/g, "").split(","), build_options()).then(resp => {
             document.getElementById("response").innerHTML = JSON.stringify(resp, null, 4);
             document.getElementById("console").innerHTML += "\n";
             document.getElementById("get").disabled = false;
