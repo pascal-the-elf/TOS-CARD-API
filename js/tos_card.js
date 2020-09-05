@@ -77,9 +77,15 @@ function tos_card() {
                 };
             });
 
-            if(cached && cached.options === Object.values(options).map(x=>x?1:0).join("").substr(1) && cached.time + self.settings.cache_time >= Date.now() && cached.card != null) {
-                console.log(`已取得符合 No.${id[i]} 的快取資料，使用快取資料`);
-                local.push([id[i],cached.card]);
+            if(cached && cached.options === Object.values(options).map(x=>x?1:0).join("").substr(1) && cached.card != null) {
+                if(cached.time + self.settings.cache_time >= Date.now()) {
+                    console.log(`已取得符合 No.${id[i]} 的快取資料，使用快取資料`);
+                    local.push([id[i],cached.card]);
+                } else {
+                    store.delete(id[i]);
+                    console.log(`符合 No.${id[i]} 的快取資料已過期，加入請求儲列`);
+                    request.push(id[i]);
+                }
             }
             else {
                 console.log(`未取得符合 No.${id[i]} 的快取資料，加入請求儲列`);
