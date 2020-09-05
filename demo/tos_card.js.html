@@ -82,15 +82,15 @@
         </div>
         <!-- Main Body End -->
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/gh/pascal-the-elf/TOS-CARD-API@latest/js/tos_card.min.js"></script>
+
+    <script src="../js/tos_card.js"></script>
     <script>
 
     (function(){
         document.getElementById("get").disabled = false;
         document.getElementById("get").innerHTML = "測試";
     })();
-        
+
     window.console.log = function(...args) {
         for(let i = 0; i < args.length; i++) {
             document.getElementById("console").innerHTML += "[Info] " + args[i] + "\n";
@@ -101,9 +101,9 @@
             document.getElementById("console").innerHTML += "[Error] " + args[i] + "\n";
         }
     };
-    
+
     var card = new tos_card();
-    
+
     function get() {
         document.getElementById("get").disabled = true;
         document.getElementById("response").innerHTML = "測試中...";
