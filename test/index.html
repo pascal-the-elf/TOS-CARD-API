@@ -131,9 +131,9 @@
     }
     
     function compare_end(a, b) {
-        if(a.end && b.end) return new Date(b.end) - new Date(a.end);
-        if(a.end) return 1;
-        if(b.end) return -1;
+        if(a.end && b.end) return new Date(a.end) - new Date(b.end);
+        if(a.end) return -1;
+        if(b.end) return 1;
         return 0;
     }
     </script>
