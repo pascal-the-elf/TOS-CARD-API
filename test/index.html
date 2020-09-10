@@ -117,8 +117,8 @@
                 let end = document.createElement("td");
 
                 name.innerHTML = `<small class="text-muted">${item.type || ""}</small>${item.type ? `<br>` : ""}${item.name}`;
-                start.innerHTML = new Date(item.start).toLocaleString();
-                end.innerHTML = item.end ? new Date(item.end).toLocaleString() : "永久開放";
+                start.innerHTML = moment(item.start).format("MoDo <br>A hh:mm");
+                end.innerHTML = item.end ? moment(item.end).format("MoDo <br>A hh:mm") : "永久開放";
 
                 row.appendChild(name);
                 row.appendChild(start);
