@@ -126,11 +126,27 @@
             });
             seals.appendChild(seals_header);
             data.data.seals.forEach((item, i) => {
+                let rate_up = item.detail.rate_up ? (new Date(item.detail.rate_up.start) - Date.now() <= 0 && new Date(item.detail.rate_up.end) - Date.now() >= 0) : 0;
                 let row = document.createElement("tr");
                 if(!(i%2)) row.classList.add("table-light");
                 let name = document.createElement("td");
+                if(rate_up) {
+                    name.classList.add("text-success");
+                }
                 let start = document.createElement("td");
                 let end = document.createElement("td");
+                if(new Date(item.start) - Date.now() > 0) {
+                    start.classList.add("text-muted");
+                    end.classList.add("text-muted");
+                }
+                else if(item.end && new Date(item.end) - Date.now() <= 3*60*60*1000) {
+                    start.classList.add("text-danger");
+                    end.classList.add("text-danger");
+                }
+                else if(item.end && new Date(item.end) - Date.now() <= 24*60*60*1000) {
+                    start.classList.add("text-warning");
+                    end.classList.add("text-warning");
+                }
 
                 name.innerHTML = `<small class="text-muted">${item.type || ""}</small>${item.type ? `<br>` : ""}${item.name}`;
                 start.innerHTML = moment(item.start).format("MoDo <br>A hh:mm");
@@ -148,12 +164,12 @@
                         cards.push(item.detail["1%"][0]);
                         for(let j = 0; j < item.detail["4.5%"].length; j++) cards.push(item.detail["4.5%"][j]);
                         for(let j = 0; j < item.detail["18%"].length; j++) cards.push(item.detail["18%"][j]);
-                        fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+cards.join(",")+"&exclude=amelioration,skills,info,story,table")
+                        fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+cards.join(","))
                         .then(r => r.json())
                         .then(j => {
                             if(j && j.info && j.info.success) {
-                                let cont = "", rate_up = (new Date(item.detail.rate_up.start) - Date.now() <= 0 && new Date(item.detail.rate_up.end) - Date.now() >= 0);
-                                cont += `${rate_up?`<span class="text-success">`:""}機率加倍：${moment(item.detail.rate_up.start).format("MoDo")} ~ ${moment(item.detail.rate_up.end).format("MoDo")}${rate_up?`</span>`:""}<br><br>`;
+                                let cont = "";
+                                cont += `${rate_up?`<b class="text-warning">`:""}機率加倍：${moment(item.detail.rate_up.start).format("MoDo")} ~ ${moment(item.detail.rate_up.end).format("MoDo")}${rate_up?`</b>`:""}<br><br>`;
                                 cont += `<b>大獎：</b><br>
                                 ${j.data[item.detail["1%"][0]].name}<br>`;
                                 cont += `<b>二獎：</b><br>
@@ -173,7 +189,7 @@
                 else if(item.type == "封印卡活動") {
                     async_cont = function(ins) {
                         if(item.detail.special) {
-                            fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+item.detail.special+"&exclude=amelioration,skills,info,story,table")
+                            fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+item.detail.special)
                             .then(r => r.json())
                             .then(j => {
                                 if(j && j.info && j.info.success) {
