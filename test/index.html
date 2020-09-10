@@ -83,8 +83,8 @@
                     }
 
                     stage.innerHTML = `<small class="text-muted">${item.type || ""}</small>${item.type ? `<br>` : ""}${item.stage}`;
-                    start.innerHTML = moment(item.start).format("MoDo <br>A hh點mm分");
-                    end.innerHTML = (new Date("2050") > new Date(item.end)) ? moment(item.end).format("MoDo <br>A hh點mm分") : "永久開放";
+                    start.innerHTML = moment(item.start).format("MoDo <br>A hh:mm");
+                    end.innerHTML = (new Date("2050") > new Date(item.end)) ? moment(item.end).format("MoDo <br>A hh:mm") : "永久開放";
 
                     row.appendChild(stage);
                     row.appendChild(start);
