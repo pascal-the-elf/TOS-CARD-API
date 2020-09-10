@@ -77,7 +77,7 @@
                         start.classList.add("text-warning");
                         end.classList.add("text-warning");
                     }
-                    else if(item.end) {
+                    else if(item.end || new Date("2050") > new Date(item.end)) {
                         start.classList.add("text-success");
                         end.classList.add("text-success");
                     }
