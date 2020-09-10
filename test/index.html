@@ -50,6 +50,7 @@
         let data = await window.api.event;
         console.log("請求完成", data);
         data.data.stages.sort(compare_end);
+        data.data.seals.sort(compare_end);
         if(data && data.info && data.info.success) {
             /* Build Stages Table */
             let stages = document.createElement("table");
