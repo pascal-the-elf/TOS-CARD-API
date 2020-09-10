@@ -73,10 +73,18 @@
                         start.classList.add("text-muted");
                         end.classList.add("text-muted");
                     }
+                    else if(new Date(item.end) - Date.now() <= 24*60*60*1000) {
+                        start.classList.add("text-warning");
+                        end.classList.add("text-warning");
+                    }
+                    else if(item.end) {
+                        start.classList.add("text-success");
+                        end.classList.add("text-success");
+                    }
 
                     stage.innerHTML = `<small class="text-muted">${item.type || ""}</small>${item.type ? `<br>` : ""}${item.stage}`;
                     start.innerHTML = new Date(item.start).toLocaleString();
-                    end.innerHTML = new Date(item.end).toLocaleString();
+                    end.innerHTML = (new Date("2050") > new Date(item.end)) ? new Date(item.end).toLocaleString() : "永久開放";
 
                     row.appendChild(stage);
                     row.appendChild(start);
