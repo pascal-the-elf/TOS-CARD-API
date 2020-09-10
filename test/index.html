@@ -13,11 +13,6 @@
         console.log("向 API 請求資料");
     })();
     </script>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/locale/zh-tw.js"></script>
 </head>
 <body>
     <div>
@@ -34,7 +29,12 @@
             </div>
         </nav>
         <br>
-        <div class="container">
+        <div id="loading">
+            <div class="loading-container"><div class="loading-spinner">
+                <div></div>
+            </div></div>
+        </div>
+        <div id="contents" class="container" style="display: none;">
             <h2>開放關卡</h2>
             <div id="stages"></div>
             <br>
@@ -43,6 +43,13 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/locale/zh-tw.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
     <script>
     build();
 
@@ -96,6 +103,13 @@
                     row.appendChild(start);
                     row.appendChild(end);
                     stages.appendChild(row);
+
+                    tippy(start, {
+                        content: (new Date(item.start) - Date.now() > 0) ? `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` : `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`
+                    });
+                    tippy(end, {
+                        content: (new Date("2050") > new Date(item.end)) ? `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` : "永久開放"
+                    });
                 }
             });
             document.getElementById("stages").appendChild(stages);
@@ -126,11 +140,71 @@
                 row.appendChild(start);
                 row.appendChild(end);
                 seals.appendChild(row);
+
+                let async_cont;
+                if(item.type == "獨立封印卡活動") {
+                    async_cont = function(ins) {
+                        let cards = [];
+                        cards.push(item.detail["1%"][0]);
+                        for(let j = 0; j < item.detail["4.5%"].length; j++) cards.push(item.detail["4.5%"][j]);
+                        for(let j = 0; j < item.detail["18%"].length; j++) cards.push(item.detail["18%"][j]);
+                        fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+cards.join(",")+"&exclude=amelioration,skills,info,story,table")
+                        .then(r => r.json())
+                        .then(j => {
+                            if(j && j.info && j.info.success) {
+                                let cont = "", rate_up = (new Date(item.detail.rate_up.start) - Date.now() <= 0 && new Date(item.detail.rate_up.end) - Date.now() >= 0);
+                                cont += `${rate_up?`<span class="text-success">`:""}機率加倍：${moment(item.detail.rate_up.start).format("MoDo")} ~ ${moment(item.detail.rate_up.end).format("MoDo")}${rate_up?`</span>`:""}<br><br>`;
+                                cont += `<b>大獎：</b><br>
+                                ${j.data[item.detail["1%"][0]].name}<br>`;
+                                cont += `<b>二獎：</b><br>
+                                ${j.data[item.detail["4.5%"][0]].name}<br>
+                                ${j.data[item.detail["4.5%"][1]].name}<br>`;
+                                cont += `<b>小獎：</b><br>
+                                ${j.data[item.detail["18%"][0]].name}<br>
+                                ${j.data[item.detail["18%"][1]].name}<br>
+                                ${j.data[item.detail["18%"][2]].name}<br>
+                                ${j.data[item.detail["18%"][3]].name}<br>
+                                ${j.data[item.detail["18%"][4]].name}`;
+                                ins.setContent(cont);
+                            }
+                        });
+                    }
+                }
+                else if(item.type == "封印卡活動") {
+                    async_cont = function(ins) {
+                        if(item.detail.special) {
+                            fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+item.detail.special+"&exclude=amelioration,skills,info,story,table")
+                            .then(r => r.json())
+                            .then(j => {
+                                if(j && j.info && j.info.success) {
+                                    let cont = "<b>機率提升(+4.5%)：</b><br>" + j.data[item.detail.special].name;
+                                    ins.setContent(cont);
+                                }
+                            });
+                        }
+                        else {
+                            ins.setContent("一般封印卡活動");
+                        }
+                    };
+                }
+                tippy(name, {
+                    content: "載入中",
+                    allowHTML: true,
+                    onShow: async_cont
+                });
+                tippy(start, {
+                    content: (new Date(item.start) - Date.now() > 0) ? `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` : `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`
+                });
+                tippy(end, {
+                    content: item.end ? `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` : "永久開放"
+                });
             });
             document.getElementById("seals").appendChild(seals);
         }
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("contents").style.display = "block";
     }
-    
+
     function compare_end(a, b) {
         if(a.end && b.end) return new Date(a.end) - new Date(b.end);
         if(a.end) return -1;
@@ -138,5 +212,39 @@
         return 0;
     }
     </script>
+    <style>
+    @keyframes loading {
+        0% { transform: translate(-50%,-50%) rotate(0deg); }
+        100% { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+    .loading-container {
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+        overflow: hidden;
+        background: none;
+        margin: 0 20px;
+    }
+    .loading-spinner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform: translateZ(0) scale(1);
+        backface-visibility: hidden;
+        transform-origin: 0 0;
+    }
+    .loading-spinner div {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border: 5px solid #1adcb6;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: loading 0.33s linear infinite;
+        top: 25px;
+        left: 25px;
+        box-sizing: content-box;
+    }
+    </style>
 </body>
 </html>
