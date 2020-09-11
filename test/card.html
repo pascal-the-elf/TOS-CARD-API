@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>神魔之塔 卡片檢視</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
+    <script>
+    var init = (async function(){
+        /* Fetch Cache */
+        await (async function() {
+            window.Fetch = async function(a, b=null) {
+                if(typeof a == "string" && !b) {
+                    let trx = window.db.transaction("requests", "readwrite");
+                    let store = trx.objectStore("requests");
+                    let cached = await new Promise((ok, reject)=>{
+                        let r = store.get(a);
+                        r.onsuccess = function() {
+                            ok(r.result);
+                        };
+                    });
+                    if(cached) {
+                        if(cached.time >= Date.now()) return new Response(cached.data);
+                        store.delete(a);
+                    }
+                }
+                var req;
+                if(b) res = await fetch(a, b).then(r => r.text());
+                else res = await fetch(a).then(r => r.text());
+                if(typeof a == "string" && !b) {
+                    let trx = window.db.transaction("requests", "readwrite");
+                    let store = trx.objectStore("requests");
+                    let c = {
+                        url: a,
+                        data: res,
+                        time: Date.now() + 60*1000
+                    };
+                    var r = store.add(c);
+                }
+                return new Response(res);
+            };
+            if (window.indexedDB) {
+                if(!window.db) window.db = {};
+                if(!window.db.request) window.db.request = indexedDB.open("Fetch Cache", 1);
+                window.db.request.onupgradeneeded = function (evt) {
+                    var store = evt.currentTarget.result.createObjectStore("requests", { keyPath: "url" });
+                    store.createIndex("data", "data", { unique: false });
+                    store.createIndex("time", "time", { unique: false });
+                };
+                await new Promise((ok, reject) => {
+                    window.db.request.onsuccess = function () {
+                        window.db = window.db.request.result;
+                        ok(true);
+                    };
+                });
+                console.log("快取資料庫已建立");
+                return true;
+            }
+            else {
+                window.Fetch = window.fetch;
+                return false;
+            }
+        })();
+
+        window.params = {};
+        let s = (new URL(location)).searchParams;
+        for (let [k, v] of s) window.params[k] = v;
+        params["id"] = params["id"] ? Number(params["id"]) : 1;
+        window.api = {};
+        window.api.card = Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+params["id"]).then(r => r.json());
+        console.log("向 API 請求資料");
+    })();
+    </script>
+</head>
+<body>
+    <div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="./">神魔之塔 卡片檢視</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1" aria-controls="navbar1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar1">
+                <ul class="navbar-nav mr-auto">
+
+                </ul>
+            </div>
+        </nav>
+        <br>
+        <div id="loading">
+            <div class="loading-container"><div class="loading-spinner">
+                <div></div>
+            </div></div>
+        </div>
+        <div id="contents" class="container" style="display: none; max-width: 600px; ">
+            <div id="head" style="height: 120px; font-size: 1.05rem;">
+                <div style="width: 100px; height: 100px; float: left; margin: 0px 10px 10px 0px;"><img class="card_thumbnail rounded float-left"></img></div>
+                <span class="card_series text-muted"></span>
+                <h1 class="card_name" style="font-size: 1.55rem; margin-bottom: 0; white-space: nowrap; overflow: auto;"></h1>
+                <span class="card_attribute"></span>屬性<span class="card_race"></span><br>
+                <span class="card_rarity"></span><br>
+            </div>
+            <div id="statistics" style="height: 60px; font-size: 1.05rem;">
+                <b>編號</b> <span class="card_id"></span><br>
+                <b>空間</b> <span class="card_space"></span><br>
+            </div>
+            <div id="stats" style="height: 320px;">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#level_max_stats" style="padding: 0.5rem 1rem;">滿等數值</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#level_1_stats" style="padding: 0.5rem 1rem;">初等數值</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#custom_level_stats" style="padding: 0.5rem 1rem;">其他等級數值</a>
+                    </li>
+                </ul>
+                <div id="stats_blocks" class="tab-content">
+                    <div class="tab-pane fade active show" id="level_max_stats">
+                        <table class="table">
+                            <tr><th>生命力</th><td></td></tr>
+                            <tr><th>攻擊力</th><td></td></tr>
+                            <tr><th>回復力</th><td></td></tr>
+                            <tr><th>總計</th><td></td></tr>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="level_1_stats">
+                        <table class="table">
+                            <tr><th>生命力</th><td></td></tr>
+                            <tr><th>攻擊力</th><td></td></tr>
+                            <tr><th>回復力</th><td></td></tr>
+                            <tr><th>總計</th><td></td></tr>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="custom_level_stats">
+                        <br>
+                        <label id="custom_level">等級</label>
+                        <input id="custom_level_input" type="range" class="custom-range" value="1" min="1" step="1" oninput="change_level_stats()">
+                        <table class="table">
+                            <tr><th>生命力</th><td></td></tr>
+                            <tr><th>攻擊力</th><td></td></tr>
+                            <tr><th>回復力</th><td></td></tr>
+                            <tr><th>總計</th><td></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="active" style="min-height: 60px; font-size: 1rem; display: none;">
+                <h3 style="font-size: 1.3rem;">主動技能</h3>
+                <div class="card_active"></div>
+            </div>
+            <div id="leader" style="min-height: 60px; font-size: 1rem; display: none;">
+                <h3 style="font-size: 1.3rem;">隊長技能</h3>
+                <div class="card_leader"></div>
+            </div>
+            <div id="amelioration" style="min-height: 60px; font-size: 1rem; display: none;">
+                <h3 style="font-size: 1.3rem;">昇華能力</h3>
+                <div class="card_amelioration"></div>
+            </div>
+            <div id="story" style="min-height: 60px; font-size: 1rem; display: none;">
+                <h3 style="font-size: 1.3rem;">卡片故事</h3>
+                <p class="card_story"></p>
+            </div>
+            <div id="info" style="min-height: 60px; font-size: 1rem; display: none;">
+                <h3 style="font-size: 1.3rem;">卡片資訊</h3>
+                <p class="card_info"></p>
+            </div>
+            <div id="end_pad" style="height: 100px;"></div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/locale/zh-tw.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <script>
+    (async function() {
+        await init;
+        build();
+    })();
+
+    async function build() {
+        let data = await window.api.card;
+        console.log("請求完成", data);
+
+        if(data && data.info && data.info.success) {
+            Array.from(document.getElementsByClassName("card_name")).forEach((item, i) => {
+                item.innerHTML = data.data[params["id"]].name;
+            });
+            Array.from(document.getElementsByClassName("card_series")).forEach((item, i) => {
+                item.innerHTML = data.data[params["id"]].series;
+            });
+            Array.from(document.getElementsByClassName("card_rarity")).forEach((item, i) => {
+                item.innerHTML = "✦".repeat(data.data[params["id"]].rarity);
+            });
+            Array.from(document.getElementsByClassName("card_attribute")).forEach((item, i) => {
+                item.innerHTML = data.data[params["id"]].attribute;
+            });
+            Array.from(document.getElementsByClassName("card_race")).forEach((item, i) => {
+                item.innerHTML = data.data[params["id"]].race;
+            });
+            Array.from(document.getElementsByClassName("card_id")).forEach((item, i) => {
+                item.innerHTML = data.data[params["id"]].id;
+            });
+            Array.from(document.getElementsByClassName("card_space")).forEach((item, i) => {
+                item.innerHTML = data.data[params["id"]].cost;
+            });
+            if(data.data[params["id"]].story) {
+                document.getElementById("story").style.display = "block";
+                Array.from(document.getElementsByClassName("card_story")).forEach((item, i) => {
+                    item.innerHTML = data.data[params["id"]].story;
+                });
+            }
+            if(data.data[params["id"]].info) {
+                document.getElementById("info").style.display = "block";
+                Array.from(document.getElementsByClassName("card_info")).forEach((item, i) => {
+                    item.innerHTML = data.data[params["id"]].info.replace(/\n/g, "<br>");
+                });
+            }
+            Array.from(document.getElementsByClassName("card_thumbnail")).forEach((item, i) => {
+                item.src = data.data[params["id"]].image;
+                item.style.width = "100%";
+            });
+            let stats_max = Object.values(data.data[params["id"]].stats_max);
+            stats_max.push(stats_max[0]+stats_max[1]+stats_max[2]);
+            Array.from(document.getElementById("level_max_stats").getElementsByTagName("td")).forEach((item, i) => {
+                item.innerHTML = stats_max[i];
+            });
+            let stats = Object.values(data.data[params["id"]].stats);
+            stats.push(stats[0]+stats[1]+stats[2]);
+            Array.from(document.getElementById("level_1_stats").getElementsByTagName("td")).forEach((item, i) => {
+                item.innerHTML = stats[i];
+            });
+            document.getElementById("custom_level_input").max = data.data[params["id"]].table.length - 1;
+            change_level_stats();
+        }
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("contents").style.display = "block";
+    }
+
+    function compare_end(a, b) {
+        if(a.end && b.end) return new Date(a.end) - new Date(b.end);
+        if(a.end) return -1;
+        if(b.end) return 1;
+        return 0;
+    }
+    async function change_level_stats() {
+        let data = await window.api.card;
+        let level = document.getElementById("custom_level_input").value;
+        document.getElementById("custom_level").innerHTML = "等級 "+level;
+        let stats = Object.values(data.data[params["id"]].table[level]).splice(0, 3);
+        stats.push(stats[0]+stats[1]+stats[2]);
+        Array.from(document.getElementById("custom_level_stats").getElementsByTagName("td")).forEach((item, i) => {
+            item.innerHTML = stats[i];
+        });
+    }
+    </script>
+    <style>
+    @keyframes loading {
+        0% { transform: translate(-50%,-50%) rotate(0deg); }
+        100% { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+    .loading-container {
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+        overflow: hidden;
+        background: none;
+        margin: 0 20px;
+    }
+    .loading-spinner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform: translateZ(0) scale(1);
+        backface-visibility: hidden;
+        transform-origin: 0 0;
+    }
+    .loading-spinner div {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border: 5px solid #1adcb6;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: loading 0.33s linear infinite;
+        top: 25px;
+        left: 25px;
+        box-sizing: content-box;
+    }
+    </style>
+</body>
+</html>
