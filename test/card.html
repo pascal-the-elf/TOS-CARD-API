@@ -170,7 +170,7 @@
             <div id="end_pad" style="height: 100px;"></div>
         </div>
     </div>
-    
+
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
@@ -213,7 +213,7 @@
             if(data.data[params["id"]].story) {
                 document.getElementById("story").style.display = "block";
                 Array.from(document.getElementsByClassName("card_story")).forEach((item, i) => {
-                    item.innerHTML = data.data[params["id"]].story;
+                    item.innerHTML = data.data[params["id"]].story.replace(/\n/g, "<br>");
                 });
             }
             if(data.data[params["id"]].info) {
