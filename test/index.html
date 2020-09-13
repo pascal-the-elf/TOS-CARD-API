@@ -184,95 +184,97 @@
             });
             seals.appendChild(seals_header);
             data.data.seals.forEach((item, i) => {
-                let rate_up = item.detail.rate_up ? (new Date(item.detail.rate_up.start) - Date.now() <= 0 && new Date(item.detail.rate_up.end) - Date.now() >= 0) : 0;
-                let row = document.createElement("tr");
-                if(!(i%2)) row.classList.add("table-light");
-                let name = document.createElement("td");
-                if(rate_up) {
-                    name.classList.add("text-success");
-                }
-                let start = document.createElement("td");
-                let end = document.createElement("td");
-                if(new Date(item.start) - Date.now() > 0) {
-                    start.classList.add("text-muted");
-                    end.classList.add("text-muted");
-                }
-                else if(item.end && new Date(item.end) - Date.now() <= 3*60*60*1000) {
-                    start.classList.add("text-danger");
-                    end.classList.add("text-danger");
-                }
-                else if(item.end && new Date(item.end) - Date.now() <= 24*60*60*1000) {
-                    start.classList.add("text-warning");
-                    end.classList.add("text-warning");
-                }
-
-                name.innerHTML = `<small class="text-muted">${item.type || ""}</small>${item.type ? `<br>` : ""}${item.name}`;
-                start.innerHTML = moment(item.start).format("MoDo <br>A hh:mm");
-                end.innerHTML = item.end ? moment(item.end).format("MoDo <br>A hh:mm") : "永久開放";
-
-                row.appendChild(name);
-                row.appendChild(start);
-                row.appendChild(end);
-                seals.appendChild(row);
-
-                let async_cont;
-                if(item.type == "獨立封印卡活動") {
-                    async_cont = function(ins) {
-                        let cards = [];
-                        cards.push(item.detail["1%"][0]);
-                        for(let j = 0; j < item.detail["4.5%"].length; j++) cards.push(item.detail["4.5%"][j]);
-                        for(let j = 0; j < item.detail["18%"].length; j++) cards.push(item.detail["18%"][j]);
-                        Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+cards.join(","))
-                        .then(r => r.json())
-                        .then(j => {
-                            if(j && j.info && j.info.success) {
-                                let cont = "";
-                                cont += `${rate_up?`<b class="text-warning">`:""}機率加倍：${moment(item.detail.rate_up.start).format("MoDo")} ~ ${moment(item.detail.rate_up.end).format("MoDo")}${rate_up?`</b>`:""}<br><br>`;
-                                cont += `<b>大獎：</b><br>
-                                <a class="text-white" href="./card?id=${item.detail["1%"][0]}">${j.data[item.detail["1%"][0]].name}</a><br>`;
-                                cont += `<b>二獎：</b><br>
-                                <a class="text-white" href="./card?id=${item.detail["4.5%"][0]}">${j.data[item.detail["4.5%"][0]].name}</a><br>
-                                <a class="text-white" href="./card?id=${item.detail["4.5%"][1]}">${j.data[item.detail["4.5%"][1]].name}</a><br>`;
-                                cont += `<b>小獎：</b><br>
-                                <a class="text-white" href="./card?id=${item.detail["18%"][0]}">${j.data[item.detail["18%"][0]].name}</a><br>
-                                <a class="text-white" href="./card?id=${item.detail["18%"][1]}">${j.data[item.detail["18%"][1]].name}</a><br>
-                                <a class="text-white" href="./card?id=${item.detail["18%"][2]}">${j.data[item.detail["18%"][2]].name}</a><br>
-                                <a class="text-white" href="./card?id=${item.detail["18%"][3]}">${j.data[item.detail["18%"][3]].name}</a><br>
-                                <a class="text-white" href="./card?id=${item.detail["18%"][4]}">${j.data[item.detail["18%"][4]].name}</a>`;
-                                ins.setContent(cont);
-                            }
-                        });
+                if(!item.end || new Date(item.end) - Date.now() >= 0) {
+                    let rate_up = item.detail.rate_up ? (new Date(item.detail.rate_up.start) - Date.now() <= 0 && new Date(item.detail.rate_up.end) - Date.now() >= 0) : 0;
+                    let row = document.createElement("tr");
+                    if(!(i%2)) row.classList.add("table-light");
+                    let name = document.createElement("td");
+                    if(rate_up) {
+                        name.classList.add("text-success");
                     }
-                }
-                else if(item.type == "封印卡活動") {
-                    async_cont = function(ins) {
-                        if(item.detail.special) {
-                            Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+item.detail.special)
+                    let start = document.createElement("td");
+                    let end = document.createElement("td");
+                    if(new Date(item.start) - Date.now() > 0) {
+                        start.classList.add("text-muted");
+                        end.classList.add("text-muted");
+                    }
+                    else if(item.end && new Date(item.end) - Date.now() <= 3*60*60*1000) {
+                        start.classList.add("text-danger");
+                        end.classList.add("text-danger");
+                    }
+                    else if(item.end && new Date(item.end) - Date.now() <= 24*60*60*1000) {
+                        start.classList.add("text-warning");
+                        end.classList.add("text-warning");
+                    }
+
+                    name.innerHTML = `<small class="text-muted">${item.type || ""}</small>${item.type ? `<br>` : ""}${item.name}`;
+                    start.innerHTML = moment(item.start).format("MoDo <br>A hh:mm");
+                    end.innerHTML = item.end ? moment(item.end).format("MoDo <br>A hh:mm") : "永久開放";
+
+                    row.appendChild(name);
+                    row.appendChild(start);
+                    row.appendChild(end);
+                    seals.appendChild(row);
+
+                    let async_cont;
+                    if(item.type == "獨立封印卡活動") {
+                        async_cont = function(ins) {
+                            let cards = [];
+                            cards.push(item.detail["1%"][0]);
+                            for(let j = 0; j < item.detail["4.5%"].length; j++) cards.push(item.detail["4.5%"][j]);
+                            for(let j = 0; j < item.detail["18%"].length; j++) cards.push(item.detail["18%"][j]);
+                            Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+cards.join(","))
                             .then(r => r.json())
                             .then(j => {
                                 if(j && j.info && j.info.success) {
-                                    let cont = "<b>機率提升(+4.5%)：</b><br>" + j.data[item.detail.special].name;
+                                    let cont = "";
+                                    cont += `${rate_up?`<b class="text-warning">`:""}機率加倍：${moment(item.detail.rate_up.start).format("MoDo")} ~ ${moment(new Date(item.detail.rate_up.end) - 1).format("MoDo")}${rate_up?`</b>`:""}<br><br>`;
+                                    cont += `<b>大獎：</b><br>
+                                    <a class="text-white" href="./card?id=${item.detail["1%"][0]}">${j.data[item.detail["1%"][0]].name}</a><br>`;
+                                    cont += `<b>二獎：</b><br>
+                                    <a class="text-white" href="./card?id=${item.detail["4.5%"][0]}">${j.data[item.detail["4.5%"][0]].name}</a><br>
+                                    <a class="text-white" href="./card?id=${item.detail["4.5%"][1]}">${j.data[item.detail["4.5%"][1]].name}</a><br>`;
+                                    cont += `<b>小獎：</b><br>
+                                    <a class="text-white" href="./card?id=${item.detail["18%"][0]}">${j.data[item.detail["18%"][0]].name}</a><br>
+                                    <a class="text-white" href="./card?id=${item.detail["18%"][1]}">${j.data[item.detail["18%"][1]].name}</a><br>
+                                    <a class="text-white" href="./card?id=${item.detail["18%"][2]}">${j.data[item.detail["18%"][2]].name}</a><br>
+                                    <a class="text-white" href="./card?id=${item.detail["18%"][3]}">${j.data[item.detail["18%"][3]].name}</a><br>
+                                    <a class="text-white" href="./card?id=${item.detail["18%"][4]}">${j.data[item.detail["18%"][4]].name}</a>`;
                                     ins.setContent(cont);
                                 }
                             });
                         }
-                        else {
-                            ins.setContent("一般封印卡活動");
-                        }
-                    };
+                    }
+                    else if(item.type == "封印卡活動") {
+                        async_cont = function(ins) {
+                            if(item.detail.special) {
+                                Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+item.detail.special)
+                                .then(r => r.json())
+                                .then(j => {
+                                    if(j && j.info && j.info.success) {
+                                        let cont = "<b>機率提升(+4.5%)：</b><br>" + j.data[item.detail.special].name;
+                                        ins.setContent(cont);
+                                    }
+                                });
+                            }
+                            else {
+                                ins.setContent("一般封印卡活動");
+                            }
+                        };
+                    }
+                    tippy(name, {
+                        content: "載入中",
+                        allowHTML: true,
+                        interactive: true,
+                        onShow: async_cont
+                    });
+                    tippy(start, {
+                        content: (new Date(item.start) - Date.now() > 0) ? `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` : `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`
+                    });
+                    tippy(end, {
+                        content: item.end ? `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` : "永久開放"
+                    });
                 }
-                tippy(name, {
-                    content: "載入中",
-                    allowHTML: true,
-                    interactive: true,
-                    onShow: async_cont
-                });
-                tippy(start, {
-                    content: (new Date(item.start) - Date.now() > 0) ? `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` : `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`
-                });
-                tippy(end, {
-                    content: item.end ? `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` : "永久開放"
-                });
             });
             document.getElementById("seals").appendChild(seals);
         }
