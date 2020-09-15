@@ -155,27 +155,27 @@
                     </div>
                 </div>
             </div>
-            <div id="active" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+            <div id="active" style="min-height: 60px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_active" data-tippy-content="收起/展開">主動技能</h3>
                 <div id="card_active" class="collapse show"></div>
             </div>
-            <div id="leader" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+            <div id="leader" style="min-height: 60px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_leader" data-tippy-content="收起/展開">隊長技能</h3>
                 <div id="card_leader" class="collapse show"></div>
             </div>
-            <div id="team_skl" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+            <div id="team_skl" style="min-height: 60px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_team_skl" data-tippy-content="收起/展開">隊伍技能</h3>
                 <div id="card_team_skl" class="collapse show"></div>
             </div>
-            <div id="amelioration" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
-                <h3 style="font-size: 1.3rem;">昇華能力</h3>
+            <div id="amelioration" style="min-height: 60px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+                <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_amelioration" data-tippy-content="收起/展開">昇華能力</h3>
                 <div id="card_amelioration" class="collapse show"></div>
             </div>
-            <div id="story" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+            <div id="story" style="min-height: 60px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_story" data-tippy-content="收起/展開">卡片故事</h3>
                 <p id="card_story" class="card_story collapse show"></p>
             </div>
-            <div id="info" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+            <div id="info" style="min-height: 60px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_info" data-tippy-content="收起/展開">卡片資訊</h3>
                 <p id="card_info" class="card_info collapse show"></p>
             </div>
@@ -313,6 +313,28 @@
                     let block = document.createElement("div");
                     block.innerHTML = `<b>技能效果：</b><br>${item.effect.replace(/\n/g, "<br>")}<br><b>發動條件：</b><br>${item.condition?item.condition.replace(/\n/g, "<br>"):"無"}<br><br>`;
                     content.appendChild(block);
+                });
+            }
+            if(data.data[params["id"]].amelioration && data.data[params["id"]].amelioration.length > 0) {
+                let amel = data.data[params["id"]].amelioration;
+                document.getElementById("amelioration").style.display = "block";
+                let content = document.createElement("table");
+                content.classList.add("table");
+                document.getElementById("card_amelioration").appendChild(content);
+                let header = document.createElement("tr"), th1 = document.createElement("th"), th2 = document.createElement("th");
+                th1.innerHTML = "昇華效果";
+                th2.innerHTML = "所需靈魂";
+                th2.style.minWidth = "100px";
+                header.appendChild(th1);
+                header.appendChild(th2);
+                content.appendChild(header);
+                amel.forEach((item, i) => {
+                    let row = document.createElement("tr"), effect = document.createElement("td"), cost = document.createElement("td");
+                    effect.innerHTML = item.effect.replace(/\n/g, "<br>");
+                    cost.innerHTML = item.cost;
+                    row.appendChild(effect);
+                    row.appendChild(cost);
+                    content.appendChild(row);
                 });
             }
             Array.from(document.getElementsByClassName("card_thumbnail")).forEach((item, i) => {

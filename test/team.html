@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>神魔之塔 組隊預覽</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
+    <script>
+    var init = (async function(){
+        /* Fetch Cache */
+        await (async function() {
+            window.Fetch = async function(a, b=null) {
+                if(typeof a == "string" && !b) {
+                    let trx = window.db.transaction("requests", "readwrite");
+                    let store = trx.objectStore("requests");
+                    let cached = await new Promise((ok, reject)=>{
+                        let r = store.get(a);
+                        r.onsuccess = function() {
+                            ok(r.result);
+                        };
+                    });
+                    if(cached) {
+                        if(cached.time >= Date.now()) return new Response(cached.data);
+                        store.delete(a);
+                    }
+                }
+                var req;
+                if(b) res = await fetch(a, b).then(r => r.text());
+                else res = await fetch(a).then(r => r.text());
+                if(typeof a == "string" && !b) {
+                    let trx = window.db.transaction("requests", "readwrite");
+                    let store = trx.objectStore("requests");
+                    let c = {
+                        url: a,
+                        data: res,
+                        time: Date.now() + 60*1000
+                    };
+                    var r = store.add(c);
+                }
+                return new Response(res);
+            };
+            if (window.indexedDB) {
+                if(!window.db) window.db = {};
+                if(!window.db.request) window.db.request = indexedDB.open("Fetch Cache", 1);
+                window.db.request.onupgradeneeded = function (evt) {
+                    var store = evt.currentTarget.result.createObjectStore("requests", { keyPath: "url" });
+                    store.createIndex("data", "data", { unique: false });
+                    store.createIndex("time", "time", { unique: false });
+                };
+                await new Promise((ok, reject) => {
+                    window.db.request.onsuccess = function () {
+                        window.db = window.db.request.result;
+                        ok(true);
+                    };
+                });
+                console.log("快取資料庫已建立");
+                return true;
+            }
+            else {
+                window.Fetch = window.fetch;
+                return false;
+            }
+        })();
+
+        window.params = {};
+        let s = (new URL(location)).searchParams;
+        for (let [k, v] of s) window.params[k] = v;
+        params["id"] = params["id"] ? params["id"] : "1";
+        try { params["id"] = params["id"].split(",").splice(0,6); }
+        catch(e) { params["id"] = [1,0,0,0,0,0]; }
+        window.api = {};
+        window.api.cards = Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+params["id"].join(",")).then(r => r.json());
+        console.log("向 API 請求資料");
+    })();
+    </script>
+</head>
+<body>
+    <div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="./">神魔之塔 組隊預覽</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1" aria-controls="navbar1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar1">
+                <ul class="navbar-nav mr-auto">
+
+                </ul>
+            </div>
+        </nav>
+        <br>
+        <div id="loading">
+            <div class="loading-container"><div class="loading-spinner">
+                <div></div>
+            </div></div>
+        </div>
+        <div id="contents" class="container" style="display: none;">
+            <br>
+            <div id="imgs"></div>
+            <div id="stats">
+                <span id="hp"></span><br>
+                <span id="atk0"></span><br>
+                <span id="atk1"></span><br>
+                <span id="atk2"></span><br>
+                <span id="atk3"></span><br>
+                <span id="atk4"></span><br>
+                <span id="rec"></span><br>
+            </div>
+            <div id="leaders"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/locale/zh-tw.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <script>
+    (async function() {
+        await init;
+        build();
+    })();
+
+    async function build() {
+        let data = await window.api.cards;
+        console.log("請求完成", data);
+        if(data && data.info && data.info.success) {
+            let cards = data.data;
+            let hp = 0, attacks = [0,0,0,0,0], recovery = 0;
+            Object.values(cards).forEach((item, i) => {
+                if(item) {
+                    hp += item.stats_max.hp;
+                    recovery += item.stats_max.recovery;
+                    if(item.attribute == "水") attacks[0] += item.stats_max.attack;
+                    if(item.attribute == "火") attacks[1] += item.stats_max.attack;
+                    if(item.attribute == "木") attacks[2] += item.stats_max.attack;
+                    if(item.attribute == "光") attacks[3] += item.stats_max.attack;
+                    if(item.attribute == "暗") attacks[4] += item.stats_max.attack;
+                }
+            });
+            document.getElementById("hp").innerHTML = "隊伍血量：" + hp;
+            document.getElementById("atk0").innerHTML = "水屬性攻擊力：" + attacks[0];
+            document.getElementById("atk1").innerHTML = "火屬性攻擊力：" + attacks[1];
+            document.getElementById("atk2").innerHTML = "木屬性攻擊力：" + attacks[2];
+            document.getElementById("atk3").innerHTML = "光屬性攻擊力：" + attacks[3];
+            document.getElementById("atk4").innerHTML = "暗屬性攻擊力：" + attacks[4];
+            document.getElementById("rec").innerHTML = "隊伍回復力：" + recovery;
+        }
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("contents").style.display = "block";
+    }
+
+    function compare_end(a, b) {
+        if(a.end && b.end) return new Date(a.end) - new Date(b.end);
+        if(a.end) return -1;
+        if(b.end) return 1;
+        return 0;
+    }
+    </script>
+    <style>
+    @keyframes loading {
+        0% { transform: translate(-50%,-50%) rotate(0deg); }
+        100% { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+    .loading-container {
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+        overflow: hidden;
+        background: none;
+        margin: 0 20px;
+    }
+    .loading-spinner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform: translateZ(0) scale(1);
+        backface-visibility: hidden;
+        transform-origin: 0 0;
+    }
+    .loading-spinner div {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border: 5px solid #1adcb6;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: loading 0.33s linear infinite;
+        top: 25px;
+        left: 25px;
+        box-sizing: content-box;
+    }
+    </style>
+</body>
+</html>
