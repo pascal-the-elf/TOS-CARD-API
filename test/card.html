@@ -105,7 +105,7 @@
                 <b>編號</b> <span class="card_id"></span><br>
                 <b>空間</b> <span class="card_space"></span><br>
             </div>
-            <div id="stats" style="height: 320px;">
+            <div id="stats" style="min-height: 240px; margin: 0.3rem 0 1.7rem 0;">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
                         <a class="nav-link active" data-toggle="tab" href="#level_max_stats" style="padding: 0.5rem 1rem;">滿等數值</a>
@@ -119,7 +119,7 @@
                 </ul>
                 <div id="stats_blocks" class="tab-content">
                     <div class="tab-pane fade active show" id="level_max_stats">
-                        <table class="table">
+                        <table class="table" style="margin: 0;">
                             <tr><th>生命力</th><td></td></tr>
                             <tr><th>攻擊力</th><td></td></tr>
                             <tr><th>回復力</th><td></td></tr>
@@ -127,7 +127,7 @@
                         </table>
                     </div>
                     <div class="tab-pane fade" id="level_1_stats">
-                        <table class="table">
+                        <table class="table" style="margin: 0;">
                             <tr><th>生命力</th><td></td></tr>
                             <tr><th>攻擊力</th><td></td></tr>
                             <tr><th>回復力</th><td></td></tr>
@@ -135,10 +135,13 @@
                         </table>
                     </div>
                     <div class="tab-pane fade" id="custom_level_stats">
-                        <br>
-                        <label id="custom_level">等級</label>
-                        <input id="custom_level_input" type="range" class="custom-range" value="1" min="1" step="1" oninput="change_level_stats()">
-                        <table class="table">
+                        <table class="table" style="margin: 0;">
+                            <tr>
+                                <th><label id="custom_level">等級</label></th>
+                                <th><input id="custom_level_input" type="range" class="custom-range" value="1" min="1" step="1" oninput="change_level_stats()"></th>
+                            </tr>
+                        </table>
+                        <table class="table" style="margin: 0;">
                             <tr><th>生命力</th><td></td></tr>
                             <tr><th>攻擊力</th><td></td></tr>
                             <tr><th>回復力</th><td></td></tr>
@@ -147,27 +150,27 @@
                     </div>
                 </div>
             </div>
-            <div id="active" style="min-height: 60px; font-size: 1rem; display: none;">
+            <div id="active" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;">主動技能</h3>
-                <div class="card_active"></div>
+                <div id="card_active"></div>
             </div>
-            <div id="leader" style="min-height: 60px; font-size: 1rem; display: none;">
+            <div id="leader" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;">隊長技能</h3>
                 <div class="card_leader"></div>
             </div>
-            <div id="amelioration" style="min-height: 60px; font-size: 1rem; display: none;">
+            <div id="amelioration" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;">昇華能力</h3>
                 <div class="card_amelioration"></div>
             </div>
-            <div id="story" style="min-height: 60px; font-size: 1rem; display: none;">
+            <div id="story" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;">卡片故事</h3>
                 <p class="card_story"></p>
             </div>
-            <div id="info" style="min-height: 60px; font-size: 1rem; display: none;">
+            <div id="info" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;">卡片資訊</h3>
                 <p class="card_info"></p>
             </div>
-            <div id="end_pad" style="height: 100px;"></div>
+            <div id="end_pad" style="height: 60px;"></div>
         </div>
     </div>
 
@@ -220,6 +223,46 @@
                 document.getElementById("info").style.display = "block";
                 Array.from(document.getElementsByClassName("card_info")).forEach((item, i) => {
                     item.innerHTML = data.data[params["id"]].info.replace(/\n/g, "<br>");
+                });
+            }
+            if(data.data[params["id"]].skills.active) {
+                let act = data.data[params["id"]].skills.active;
+                document.getElementById("active").style.display = "block";
+                let nav = document.createElement("ul"), content = document.createElement("div");
+                nav.classList.add("nav", "nav-tabs");
+                content.classList.add("tab-content");
+                document.getElementById("card_active").appendChild(nav);
+                document.getElementById("card_active").appendChild(content);
+                act.forEach((item, i) => {
+                    let tab = document.createElement("li"), link = document.createElement("a");
+                    tab.classList.add("nav-item");
+                    link.classList.add("nav-link");
+                    if(!i) link.classList.add("active");
+                    link.dataset.toggle = "tab";
+                    link.href = "#active_skill_" + i;
+                    link.style.padding = "0.5rem 1rem";
+                    link.innerHTML = item.name;
+                    tab.appendChild(link);
+                    nav.appendChild(tab);
+
+                    let block = document.createElement("div"), info = document.createElement("table"),
+                    tr1 = document.createElement("tr"), cd = document.createElement("th"), lvl = document.createElement("th"),
+                    tr2 = document.createElement("tr"), effect = document.createElement("td");
+                    block.classList.add("tab-pane", "fade");
+                    if(!i) block.classList.add("active", "show");
+                    block.id = "active_skill_" + i;
+                    info.classList.add("table");
+                    cd.innerHTML = `最小 ${item.cd?"CD":"EP"}：${item.cd?item.cd.min:item.ep.min}`;
+                    lvl.innerHTML = `最高技能等級：${item.cd?(item.cd.max-item.cd.min+1):(item.ep.max-item.ep.min+1)}`;
+                    effect.colSpan = "2";
+                    effect.innerHTML += item.effect.replace(/\n/g, "<br>");
+                    tr1.appendChild(cd);
+                    tr1.appendChild(lvl);
+                    tr2.appendChild(effect);
+                    info.appendChild(tr1);
+                    info.appendChild(tr2);
+                    block.appendChild(info);
+                    content.appendChild(block);
                 });
             }
             Array.from(document.getElementsByClassName("card_thumbnail")).forEach((item, i) => {
