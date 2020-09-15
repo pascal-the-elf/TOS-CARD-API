@@ -77,11 +77,11 @@
     <div>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <a class="navbar-brand" href="./">神魔之塔 卡片檢視</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar1" aria-controls="navbar1" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#head_nav" aria-controls="head_nav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbar1">
+            <div class="collapse navbar-collapse" id="head_nav">
                 <ul class="navbar-nav mr-auto">
 
                 </ul>
@@ -95,11 +95,16 @@
         </div>
         <div id="contents" class="container" style="display: none; max-width: 600px; ">
             <div id="head" style="height: 120px; font-size: 1.05rem;">
-                <div style="width: 100px; height: 100px; float: left; margin: 0px 10px 10px 0px;"><img class="card_thumbnail rounded float-left"></img></div>
+                <div style="width: 100px; height: 100px; float: left; margin: 0px 10px 10px 0px;"><a id="img_toggle" data-toggle="collapse" data-target="#full_img_block"><img class="card_thumbnail rounded float-left"></img></a></div>
                 <span class="card_series text-muted"></span>
                 <h1 class="card_name" style="font-size: 1.55rem; margin-bottom: 0; white-space: nowrap; overflow: auto;"></h1>
                 <span class="card_attribute"></span>屬性<span class="card_race"></span><br>
                 <span class="card_rarity"></span><br>
+            </div>
+            <div class="collapse" id="full_img_block">
+                <div class="card card-body">
+                    <img id="full_img" style="width: 100%;" data-tippy-content="圖片是從<a href='https://gallery.tosgame.com/' target='_blank'>神魔官方圖鑑</a>找來的"></img>
+                </div>
             </div>
             <div id="statistics" style="height: 60px; font-size: 1.05rem;">
                 <b>編號</b> <span class="card_id"></span><br>
@@ -150,25 +155,29 @@
                     </div>
                 </div>
             </div>
-            <div id="active" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
-                <h3 style="font-size: 1.3rem;">主動技能</h3>
-                <div id="card_active"></div>
+            <div id="active" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+                <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_active" data-tippy-content="收起/展開">主動技能</h3>
+                <div id="card_active" class="collapse show"></div>
             </div>
-            <div id="leader" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
-                <h3 style="font-size: 1.3rem;">隊長技能</h3>
-                <div class="card_leader"></div>
+            <div id="leader" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+                <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_leader" data-tippy-content="收起/展開">隊長技能</h3>
+                <div id="card_leader" class="collapse show"></div>
             </div>
-            <div id="amelioration" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+            <div id="team_skl" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+                <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_team_skl" data-tippy-content="收起/展開">隊伍技能</h3>
+                <div id="card_team_skl" class="collapse show"></div>
+            </div>
+            <div id="amelioration" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
                 <h3 style="font-size: 1.3rem;">昇華能力</h3>
-                <div class="card_amelioration"></div>
+                <div id="card_amelioration" class="collapse show"></div>
             </div>
-            <div id="story" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
-                <h3 style="font-size: 1.3rem;">卡片故事</h3>
-                <p class="card_story"></p>
+            <div id="story" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+                <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_story" data-tippy-content="收起/展開">卡片故事</h3>
+                <p id="card_story" class="card_story collapse show"></p>
             </div>
-            <div id="info" style="min-height: 120px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
-                <h3 style="font-size: 1.3rem;">卡片資訊</h3>
-                <p class="card_info"></p>
+            <div id="info" style="min-height: 80px; font-size: 1rem; display: none; margin: 0.3rem 0 1.7rem 0;">
+                <h3 style="font-size: 1.3rem;" data-toggle="collapse" href="#card_info" data-tippy-content="收起/展開">卡片資訊</h3>
+                <p id="card_info" class="card_info collapse show"></p>
             </div>
             <div id="end_pad" style="height: 60px;"></div>
         </div>
@@ -213,6 +222,7 @@
             Array.from(document.getElementsByClassName("card_space")).forEach((item, i) => {
                 item.innerHTML = data.data[params["id"]].cost;
             });
+            document.getElementById("full_img").src = `https://web-assets.tosconfig.com/gallery/cards/${data.data[params["id"]].id}.jpg`;
             if(data.data[params["id"]].story) {
                 document.getElementById("story").style.display = "block";
                 Array.from(document.getElementsByClassName("card_story")).forEach((item, i) => {
@@ -225,7 +235,7 @@
                     item.innerHTML = data.data[params["id"]].info.replace(/\n/g, "<br>");
                 });
             }
-            if(data.data[params["id"]].skills.active) {
+            if(data.data[params["id"]].skills.active && data.data[params["id"]].skills.active.length > 0) {
                 let act = data.data[params["id"]].skills.active;
                 document.getElementById("active").style.display = "block";
                 let nav = document.createElement("ul"), content = document.createElement("div");
@@ -265,6 +275,46 @@
                     content.appendChild(block);
                 });
             }
+            if(data.data[params["id"]].skills.leader && data.data[params["id"]].skills.leader.length > 0) {
+                let skill = data.data[params["id"]].skills.leader;
+                document.getElementById("leader").style.display = "block";
+                let nav = document.createElement("ul"), content = document.createElement("div");
+                nav.classList.add("nav", "nav-tabs");
+                content.classList.add("tab-content");
+                document.getElementById("card_leader").appendChild(nav);
+                document.getElementById("card_leader").appendChild(content);
+                skill.forEach((item, i) => {
+                    let tab = document.createElement("li"), link = document.createElement("a");
+                    tab.classList.add("nav-item");
+                    link.classList.add("nav-link");
+                    if(!i) link.classList.add("active");
+                    link.dataset.toggle = "tab";
+                    link.href = "#leader_skill_" + i;
+                    link.style.padding = "0.5rem 1rem";
+                    link.innerHTML = item.name;
+                    tab.appendChild(link);
+                    nav.appendChild(tab);
+
+                    let block = document.createElement("div");
+                    block.classList.add("tab-pane", "fade");
+                    if(!i) block.classList.add("active", "show");
+                    block.id = "leader_skill_" + i;
+                    block.innerHTML += item.effect.replace(/\n/g, "<br>");
+                    content.appendChild(block);
+                });
+            }
+            if(data.data[params["id"]].skills.team && data.data[params["id"]].skills.team.length > 0) {
+                let skills = data.data[params["id"]].skills.team;
+                document.getElementById("team_skl").style.display = "block";
+                let content = document.createElement("div");
+                content.classList.add("card", "card-body");
+                document.getElementById("card_team_skl").appendChild(content);
+                skills.forEach((item, i) => {
+                    let block = document.createElement("div");
+                    block.innerHTML = `<b>技能效果：</b><br>${item.effect.replace(/\n/g, "<br>")}<br><b>發動條件：</b><br>${item.condition?item.condition.replace(/\n/g, "<br>"):"無"}<br><br>`;
+                    content.appendChild(block);
+                });
+            }
             Array.from(document.getElementsByClassName("card_thumbnail")).forEach((item, i) => {
                 item.src = data.data[params["id"]].image;
                 item.style.width = "100%";
@@ -284,6 +334,10 @@
         }
         document.getElementById("loading").style.display = "none";
         document.getElementById("contents").style.display = "block";
+        tippy("[data-tippy-content]", {
+            allowHTML: true,
+            interactive: true
+        });
     }
 
     function compare_end(a, b) {
