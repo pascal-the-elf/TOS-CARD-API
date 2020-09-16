@@ -146,7 +146,7 @@
                     img.style.width = "100%";
                     img.src = `https://web-assets.tosconfig.com/gallery/icons/${item.id.toString().padStart(4, "0")}.jpg`;
                     let img_tip = `<b><a class="text-white" href="card?id=${item.id}" target="_blank">${item.name}</a></b><br><br>`;
-                    img_tip += `生命力：${item.stats_max.hp}<br>攻擊力：${item.stats_max.attack}<br>回復力：${item.stats_max.recovery}<br><br>`;
+                    img_tip += `生/攻/回：${item.stats_max.hp}/${item.stats_max.attack}/${item.stats_max.recovery}<br>`;
                     if(item.skills.active && item.skills.active.length) {
                         img_tip += `主動技能：<br>`;
                         item.skills.active.forEach((item, i) => {
