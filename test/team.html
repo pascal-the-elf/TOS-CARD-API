@@ -139,7 +139,8 @@
         if(data && data.info && data.info.success) {
             let cards = data.data;
             let hp = 0, attacks = [0,0,0,0,0], recovery = 0;
-            Object.values(cards).forEach((item, i) => {
+            params["id"].forEach((item, i) => {
+                item = cards[item];
                 if(item) {
                     let img = document.createElement("img");
                     img.style.width = "100%";
