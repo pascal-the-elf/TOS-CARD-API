@@ -150,7 +150,7 @@
                     if(item.skills.active && item.skills.active.length) {
                         img_tip += `主動技能：<br>`;
                         item.skills.active.forEach((item, i) => {
-                            img_tip += `<b>${item.name}</b><br>${item.effect.replace(/\n/g, "<br>")}<br><br>`;
+                            img_tip += `<b>${item.name}</b><br>${item.effect.replace(/\n/g, " &nbsp; ")}<br><br>`;
                         });
                     }
                     document.getElementsByClassName("card_img")[i].appendChild(img);
