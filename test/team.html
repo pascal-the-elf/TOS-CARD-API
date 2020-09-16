@@ -95,17 +95,26 @@
                 <div></div>
             </div></div>
         </div>
-        <div id="contents" class="container" style="display: none;">
+        <div id="contents" class="container" style="display: none; max-width: 600px;">
             <br>
-            <div id="imgs"></div>
+            <div id="imgs" class="card" style="width:100%; display: flex; flex;flex-direction: row; justify-content: space-around; align-items: center;">
+                <div class="card_img card" style="width: 15%; margin: 4px;"></div>
+                <div class="card_img card" style="width: 15%; margin: 4px;"></div>
+                <div class="card_img card" style="width: 15%; margin: 4px;"></div>
+                <div class="card_img card" style="width: 15%; margin: 4px;"></div>
+                <div class="card_img card" style="width: 15%; margin: 4px;"></div>
+                <div class="card_img card" style="width: 15%; margin: 4px;"></div>
+            </div>
             <div id="stats">
-                <span id="hp"></span><br>
-                <span id="atk0"></span><br>
-                <span id="atk1"></span><br>
-                <span id="atk2"></span><br>
-                <span id="atk3"></span><br>
-                <span id="atk4"></span><br>
-                <span id="rec"></span><br>
+                <table class="table">
+                    <tr><td style="color: #18bc9c;"><span id="hp"></span></td></tr>
+                    <tr><td style="color: #3498db;"><span id="atk0"></span></td></tr>
+                    <tr><td style="color: #e74c3c;"><span id="atk1"></span></td></tr>
+                    <tr><td style="color: #18bc5b;"><span id="atk2"></span></td></tr>
+                    <tr><td style="color: #f5c94a;"><span id="atk3"></span></td></tr>
+                    <tr><td style="color: #810bff;"><span id="atk4"></span></td></tr>
+                    <tr><td style="color: #18bc9c;"><span id="rec"></span></td></tr>
+                </table>
             </div>
             <div id="leaders"></div>
         </div>
@@ -132,6 +141,24 @@
             let hp = 0, attacks = [0,0,0,0,0], recovery = 0;
             Object.values(cards).forEach((item, i) => {
                 if(item) {
+                    let img = document.createElement("img");
+                    img.style.width = "100%";
+                    img.src = `https://web-assets.tosconfig.com/gallery/icons/${item.id.toString().padStart(4, "0")}.jpg`;
+                    let img_tip = `<b><a class="text-white" href="card?id=${item.id}" target="_blank">${item.name}</a></b><br><br>`;
+                    img_tip += `生命力：${item.stats_max.hp}<br>攻擊力：${item.stats_max.attack}<br>回復力：${item.stats_max.recovery}<br><br>`;
+                    if(item.skills.active && item.skills.active.length) {
+                        img_tip += `主動技能：<br>`;
+                        item.skills.active.forEach((item, i) => {
+                            img_tip += `<b>${item.name}</b><br>${item.effect}<br><br>`;
+                        });
+                    }
+                    document.getElementsByClassName("card_img")[i].appendChild(img);
+                    tippy(document.getElementsByClassName("card_img")[i], {
+                        allowHTML: true,
+                        interactive: true,
+                        content: img_tip,
+                        maxWidth: 400
+                    });
                     hp += item.stats_max.hp;
                     recovery += item.stats_max.recovery;
                     if(item.attribute == "水") attacks[0] += item.stats_max.attack;
@@ -139,6 +166,20 @@
                     if(item.attribute == "木") attacks[2] += item.stats_max.attack;
                     if(item.attribute == "光") attacks[3] += item.stats_max.attack;
                     if(item.attribute == "暗") attacks[4] += item.stats_max.attack;
+                    if(i == 0) {
+                        let leader_skl = document.createElement("div");
+                        leader_skl.classList.add("card");
+                        leader_skl.style.padding = "6px";
+                        leader_skl.innerHTML += `<h4>隊長技能：${item.skills.leader[0].name}</h4><p>${item.skills.leader[0].effect}</p>`;
+                        document.getElementById("leaders").appendChild(leader_skl);
+                    }
+                    if(i == 5) {
+                        let leader_skl = document.createElement("div");
+                        leader_skl.classList.add("card");
+                        leader_skl.style.padding = "6px";
+                        leader_skl.innerHTML += `<h4>戰友技能：${item.skills.leader[0].name}</h4><p>${item.skills.leader[0].effect}</p>`;
+                        document.getElementById("leaders").appendChild(leader_skl);
+                    }
                 }
             });
             document.getElementById("hp").innerHTML = "隊伍血量：" + hp;
