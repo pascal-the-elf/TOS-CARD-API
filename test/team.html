@@ -150,7 +150,7 @@
                     if(item.skills.active && item.skills.active.length) {
                         img_tip += `主動技能：<br>`;
                         item.skills.active.forEach((item, i) => {
-                            img_tip += `<b>${item.name}</b><br>${item.effect}<br><br>`;
+                            img_tip += `<b>${item.name}</b><br>${item.effect.replace(/\n/g, "<br>")}<br><br>`;
                         });
                     }
                     document.getElementsByClassName("card_img")[i].appendChild(img);
@@ -171,14 +171,16 @@
                         let leader_skl = document.createElement("div");
                         leader_skl.classList.add("card");
                         leader_skl.style.padding = "6px";
-                        leader_skl.innerHTML += `<h4>隊長技能：${item.skills.leader[0].name}</h4><p>${item.skills.leader[0].effect}</p>`;
+                        leader_skl.style.marginBottom = "6px";
+                        leader_skl.innerHTML += `<h4>隊長技能：${item.skills.leader[0].name}</h4><p>${item.skills.leader[0].effect.replace(/\n/g, "<br>")}</p>`;
                         document.getElementById("leaders").appendChild(leader_skl);
                     }
                     if(i == 5) {
                         let leader_skl = document.createElement("div");
                         leader_skl.classList.add("card");
                         leader_skl.style.padding = "6px";
-                        leader_skl.innerHTML += `<h4>戰友技能：${item.skills.leader[0].name}</h4><p>${item.skills.leader[0].effect}</p>`;
+                        leader_skl.style.marginBottom = "6px";
+                        leader_skl.innerHTML += `<h4>戰友技能：${item.skills.leader[0].name}</h4><p>${item.skills.leader[0].effect.replace(/\n/g, "<br>")}</p>`;
                         document.getElementById("leaders").appendChild(leader_skl);
                     }
                 }
