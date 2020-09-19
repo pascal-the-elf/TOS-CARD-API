@@ -6,62 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
+    <script src="../js/tos_api.js"></script>
     <script>
     var init = (async function(){
-        /* Fetch Cache */
-        await (async function() {
-            window.Fetch = async function(a, b=null) {
-                if(typeof a == "string" && !b) {
-                    let trx = window.db.transaction("requests", "readwrite");
-                    let store = trx.objectStore("requests");
-                    let cached = await new Promise((ok, reject)=>{
-                        let r = store.get(a);
-                        r.onsuccess = function() {
-                            ok(r.result);
-                        };
-                    });
-                    if(cached) {
-                        if(cached.time >= Date.now()) return new Response(cached.data);
-                        store.delete(a);
-                    }
-                }
-                var req;
-                if(b) res = await fetch(a, b).then(r => r.text());
-                else res = await fetch(a).then(r => r.text());
-                if(typeof a == "string" && !b) {
-                    let trx = window.db.transaction("requests", "readwrite");
-                    let store = trx.objectStore("requests");
-                    let c = {
-                        url: a,
-                        data: res,
-                        time: Date.now() + 60*1000
-                    };
-                    var r = store.add(c);
-                }
-                return new Response(res);
-            };
-            if (window.indexedDB) {
-                if(!window.db) window.db = {};
-                if(!window.db.request) window.db.request = indexedDB.open("Fetch Cache", 1);
-                window.db.request.onupgradeneeded = function (evt) {
-                    var store = evt.currentTarget.result.createObjectStore("requests", { keyPath: "url" });
-                    store.createIndex("data", "data", { unique: false });
-                    store.createIndex("time", "time", { unique: false });
-                };
-                await new Promise((ok, reject) => {
-                    window.db.request.onsuccess = function () {
-                        window.db = window.db.request.result;
-                        ok(true);
-                    };
-                });
-                console.log("快取資料庫已建立");
-                return true;
-            }
-            else {
-                window.Fetch = window.fetch;
-                return false;
-            }
-        })();
+        window.api = new tos_api();
+        await window.api.init();
 
         window.params = {};
         let s = (new URL(location)).searchParams;
@@ -69,9 +18,7 @@
         params["id"] = params["id"] ? params["id"] : "1";
         try { params["id"] = params["id"].split(",").splice(0,6); }
         catch(e) { params["id"] = [1,0,0,0,0,0]; }
-        window.api = {};
-        window.api.cards = Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+params["id"].join(",")).then(r => r.json());
-        console.log("向 API 請求資料");
+        window.cards = window.api.card.get(params["id"]);
     })();
     </script>
 </head>
@@ -134,13 +81,11 @@
     })();
 
     async function build() {
-        let data = await window.api.cards;
-        console.log("請求完成", data);
-        if(data && data.info && data.info.success) {
-            let cards = data.data;
+        let data = await window.cards;
+        if(data) {
             let hp = 0, attacks = [0,0,0,0,0], recovery = 0;
             params["id"].forEach((item, i) => {
-                item = cards[item];
+                item = data[item];
                 if(item) {
                     let img = document.createElement("img");
                     img.style.width = "100%";

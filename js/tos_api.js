@@ -3,6 +3,7 @@ function tos_api() {
 
     self.init = async function() {
         await self.cache.init();
+        return true;
     };
     self.event = {
         get: async function() {
@@ -34,8 +35,9 @@ function tos_api() {
             else if(typeof id == "number") id = [id.toString()];
             else if(Array.isArray(id) && id.length > 0) {
                 id = id.map(item => {
-                    if(typeof item == "number") return item.toString();
-                    else if(typeof item != "string") return "";
+                    if(typeof item == "string") return item;
+                    else if(typeof item == "number") return item.toString();
+                    else return "";
                 });
             }
             else return false;
@@ -318,5 +320,4 @@ function tos_api() {
         }
     };
 
-    self.init();
 }

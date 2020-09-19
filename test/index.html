@@ -6,66 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet">
+    <script src="../js/tos_api.js"></script>
     <script>
     var init = (async function(){
-        /* Fetch Cache */
-        await (async function() {
-            window.Fetch = async function(a, b=null) {
-                if(typeof a == "string" && !b) {
-                    let trx = window.db.transaction("requests", "readwrite");
-                    let store = trx.objectStore("requests");
-                    let cached = await new Promise((ok, reject)=>{
-                        let r = store.get(a);
-                        r.onsuccess = function() {
-                            ok(r.result);
-                        };
-                    });
-                    if(cached) {
-                        if(cached.time >= Date.now()) return new Response(cached.data);
-                        store.delete(a);
-                    }
-                }
-                var req;
-                if(b) res = await fetch(a, b).then(r => r.text());
-                else res = await fetch(a).then(r => r.text());
-                if(typeof a == "string" && !b) {
-                    let trx = window.db.transaction("requests", "readwrite");
-                    let store = trx.objectStore("requests");
-                    let c = {
-                        url: a,
-                        data: res,
-                        time: Date.now() + 60*1000
-                    };
-                    var r = store.add(c);
-                }
-                return new Response(res);
-            };
-            if (window.indexedDB) {
-                if(!window.db) window.db = {};
-                if(!window.db.request) window.db.request = indexedDB.open("Fetch Cache", 1);
-                window.db.request.onupgradeneeded = function (evt) {
-                    var store = evt.currentTarget.result.createObjectStore("requests", { keyPath: "url" });
-                    store.createIndex("data", "data", { unique: false });
-                    store.createIndex("time", "time", { unique: false });
-                };
-                await new Promise((ok, reject) => {
-                    window.db.request.onsuccess = function () {
-                        window.db = window.db.request.result;
-                        ok(true);
-                    };
-                });
-                console.log("快取資料庫已建立");
-                return true;
-            }
-            else {
-                window.Fetch = window.fetch;
-                return false;
-            }
-        })();
-
-        window.api = {};
-        window.api.event = Fetch("https://tos-api.pascaltheelf.workers.dev/v1/event/get").then(r => r.json());
-        console.log("向 API 請求資料");
+        window.api = new tos_api();
+        await window.api.init();
+        window.tos_event = window.api.event.get();
     })();
     </script>
 </head>
@@ -112,11 +58,10 @@
     })();
 
     async function build() {
-        let data = await window.api.event;
-        console.log("請求完成", data);
-        data.data.stages.sort(compare_end);
-        data.data.seals.sort(compare_end);
-        if(data && data.info && data.info.success) {
+        let data = await window.tos_event;
+        data.stages.sort(compare_end);
+        data.seals.sort(compare_end);
+        if(data) {
             /* Build Stages Table */
             let stages = document.createElement("table");
             stages.classList.add("table");
@@ -129,7 +74,7 @@
             });
             stages.appendChild(stages_header);
             let cc = 0;
-            data.data.stages.forEach((item, i) => {
+            data.stages.forEach((item, i) => {
                 if(new Date(item.end) - Date.now() >= 0) {
                     let row = document.createElement("tr");
                     if(++cc%2) row.classList.add("table-light");
@@ -183,7 +128,7 @@
                 seals_header.appendChild(th);
             });
             seals.appendChild(seals_header);
-            data.data.seals.forEach((item, i) => {
+            data.seals.forEach((item, i) => {
                 if(!item.end || new Date(item.end) - Date.now() >= 0) {
                     let rate_up = item.detail.rate_up ? (new Date(item.detail.rate_up.start) - Date.now() <= 0 && new Date(item.detail.rate_up.end) - Date.now() >= 0) : 0;
                     let row = document.createElement("tr");
@@ -223,38 +168,32 @@
                             cards.push(item.detail["1%"][0]);
                             for(let j = 0; j < item.detail["4.5%"].length; j++) cards.push(item.detail["4.5%"][j]);
                             for(let j = 0; j < item.detail["18%"].length; j++) cards.push(item.detail["18%"][j]);
-                            Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+cards.join(","))
-                            .then(r => r.json())
-                            .then(j => {
-                                if(j && j.info && j.info.success) {
-                                    let cont = "";
-                                    cont += `${rate_up?`<b class="text-warning">`:""}機率加倍：${moment(item.detail.rate_up.start).format("MoDo")} ~ ${moment(new Date(item.detail.rate_up.end) - 1).format("MoDo")}${rate_up?`</b>`:""}<br><br>`;
-                                    cont += `<b>大獎：</b><br>
-                                    <a class="text-white" href="./card?id=${item.detail["1%"][0]}">${j.data[item.detail["1%"][0]].name}</a><br>`;
-                                    cont += `<b>二獎：</b><br>
-                                    <a class="text-white" href="./card?id=${item.detail["4.5%"][0]}">${j.data[item.detail["4.5%"][0]].name}</a><br>
-                                    <a class="text-white" href="./card?id=${item.detail["4.5%"][1]}">${j.data[item.detail["4.5%"][1]].name}</a><br>`;
-                                    cont += `<b>小獎：</b><br>
-                                    <a class="text-white" href="./card?id=${item.detail["18%"][0]}">${j.data[item.detail["18%"][0]].name}</a><br>
-                                    <a class="text-white" href="./card?id=${item.detail["18%"][1]}">${j.data[item.detail["18%"][1]].name}</a><br>
-                                    <a class="text-white" href="./card?id=${item.detail["18%"][2]}">${j.data[item.detail["18%"][2]].name}</a><br>
-                                    <a class="text-white" href="./card?id=${item.detail["18%"][3]}">${j.data[item.detail["18%"][3]].name}</a><br>
-                                    <a class="text-white" href="./card?id=${item.detail["18%"][4]}">${j.data[item.detail["18%"][4]].name}</a>`;
-                                    ins.setContent(cont);
-                                }
+                            api.card.get(cards)
+                            .then(data => {
+                                let cont = "";
+                                cont += `${rate_up?`<b class="text-warning">`:""}機率加倍：${moment(item.detail.rate_up.start).format("MoDo")} ~ ${moment(new Date(item.detail.rate_up.end) - 1).format("MoDo")}${rate_up?`</b>`:""}<br><br>`;
+                                cont += `<b>大獎：</b><br>
+                                <a class="text-white" href="./card?id=${item.detail["1%"][0]}">${data[item.detail["1%"][0]].name}</a><br>`;
+                                cont += `<b>二獎：</b><br>
+                                <a class="text-white" href="./card?id=${item.detail["4.5%"][0]}">${data[item.detail["4.5%"][0]].name}</a><br>
+                                <a class="text-white" href="./card?id=${item.detail["4.5%"][1]}">${data[item.detail["4.5%"][1]].name}</a><br>`;
+                                cont += `<b>小獎：</b><br>
+                                <a class="text-white" href="./card?id=${item.detail["18%"][0]}">${data[item.detail["18%"][0]].name}</a><br>
+                                <a class="text-white" href="./card?id=${item.detail["18%"][1]}">${data[item.detail["18%"][1]].name}</a><br>
+                                <a class="text-white" href="./card?id=${item.detail["18%"][2]}">${data[item.detail["18%"][2]].name}</a><br>
+                                <a class="text-white" href="./card?id=${item.detail["18%"][3]}">${data[item.detail["18%"][3]].name}</a><br>
+                                <a class="text-white" href="./card?id=${item.detail["18%"][4]}">${data[item.detail["18%"][4]].name}</a>`;
+                                ins.setContent(cont);
                             });
                         }
                     }
                     else if(item.type == "封印卡活動") {
                         async_cont = function(ins) {
                             if(item.detail.special) {
-                                Fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/info?id="+item.detail.special)
-                                .then(r => r.json())
-                                .then(j => {
-                                    if(j && j.info && j.info.success) {
-                                        let cont = "<b>機率提升(+4.5%)：</b><br>" + j.data[item.detail.special].name;
-                                        ins.setContent(cont);
-                                    }
+                                api.card.get(item.detail.special)
+                                .then(data => {
+                                    let cont = "<b>機率提升(+4.5%)：</b><br>" + data[item.detail.special].name;
+                                    ins.setContent(cont);
                                 });
                             }
                             else {
