@@ -301,7 +301,65 @@ function tos_api() {
                 .catch(err => {console.error("寫入快取資料失敗", err)});
             }
         },
-        info: async function() {},
+        info: async function() {
+            var get_table_size = function(db, dbName){
+                return new Promise((resolve,reject) => {
+                    var size = 0;
+                    var transaction = db.transaction([dbName]).objectStore(dbName).openCursor();
+
+                    transaction.onsuccess = function(event){
+                        var cursor = event.target.result;
+                        if(cursor){
+                            var storedObject = cursor.value;
+                            var json = JSON.stringify(storedObject);
+                            size += json.length;
+                            cursor.continue();
+                        }
+                        else{
+                            resolve(size);
+                        }
+                    }.bind(this);
+                    transaction.onerror = function(err){
+                        reject("error: " + err);
+                    }
+                });
+            };
+
+            var human_readable_size = function (bytes) {
+                var thresh = 1024;
+                if(Math.abs(bytes) < thresh) {
+                    return bytes + ' B';
+                }
+                var units = ['KB','MB','GB','TB','PB','EB','ZB','YB'];
+                var u = -1;
+                do {
+                    bytes /= thresh;
+                    ++u;
+                } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+                return bytes.toFixed(1)+' '+units[u];
+            }
+
+            let db_names = ["card", "event", "stage"];
+            let result = {}, sum = 0;
+            for(let i = 0; i < db_names.length; i++) {
+                let db_name = db_names[i];
+                let db = self.cache.db[db_name];
+                var table_names = [...db.objectStoreNames];
+                var table_size_getters = table_names.reduce((acc, table_name) => {
+                    acc.push( get_table_size(db, table_name) );
+                    return acc;
+                }, []);
+                let total = 0;
+                await Promise.all(table_size_getters).then(size => {
+                    total += Number(size);
+                });
+                result[db_name] = total;
+                sum += total;
+            }
+            result["TOTAL"] = sum;
+            result["READABLE"] = human_readable_size(sum);
+            return result;
+        },
         clear: function() {
             indexedDB.deleteDatabase("Card Cache");
             indexedDB.deleteDatabase("Event Cache");
