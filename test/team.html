@@ -129,6 +129,19 @@
                         document.getElementById("leaders").appendChild(leader_skl);
                     }
                 }
+                else {
+                    let img = document.createElement("img");
+                    img.style.width = "100%";
+                    img.src = `https://dummyimage.com/150/ffffff/000000.jpg&text=+`;
+                    let img_tip = `<b>沒有卡片</b><br>`;
+                    document.getElementsByClassName("card_img")[i].appendChild(img);
+                    tippy(document.getElementsByClassName("card_img")[i], {
+                        allowHTML: true,
+                        interactive: true,
+                        content: img_tip,
+                        maxWidth: 400
+                    });
+                }
             });
             document.getElementById("hp").innerHTML = "隊伍血量：" + hp;
             document.getElementById("atk0").innerHTML = "水屬性攻擊力：" + attacks[0];
