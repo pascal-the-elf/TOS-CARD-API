@@ -77,6 +77,9 @@ function tos_api() {
                 console.log("成功向 API 搜尋卡片資料", response);
                 return response.data;
             }
+        },
+        all: async function() {
+            return self.card.search({star:[1,2,3,4,5,6,7,8]});
         }
     };
     self.stage = {
