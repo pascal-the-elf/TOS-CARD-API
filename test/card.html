@@ -168,7 +168,7 @@
             Array.from(document.getElementsByClassName("card_space")).forEach((item, i) => {
                 item.innerHTML = data[params["id"]].cost;
             });
-            document.getElementById("full_img").src = `https://web-assets.tosconfig.com/gallery/cards/${data[params["id"]].id}.jpg`;
+            document.getElementById("full_img").src = `https://web-assets.tosconfig.com/gallery/cards/${data[params["id"]].id.toString().padStart(4, "0")}.jpg`;
             if(data[params["id"]].story) {
                 document.getElementById("story").style.display = "block";
                 Array.from(document.getElementsByClassName("card_story")).forEach((item, i) => {
