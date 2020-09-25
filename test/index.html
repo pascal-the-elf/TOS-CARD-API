@@ -99,6 +99,10 @@
                     }
 
                     stage.innerHTML = `<small class="text-muted">${item.type || ""}</small>${item.type ? `<br>` : ""}${item.stage}`;
+                    stage.addEventListener("click", function() {
+                        let new_win = window.open("url", "_blank");
+                        new_win.location = "https://tos.fandom.com/zh/wiki/" + item.stage;
+                    });
                     start.innerHTML = moment(item.start).format("MoDo <br>A hh:mm");
                     end.innerHTML = (new Date("2050") > new Date(item.end)) ? moment(item.end).format("MoDo <br>A hh:mm") : "永久開放";
 
@@ -107,11 +111,21 @@
                     row.appendChild(end);
                     stages.appendChild(row);
 
+                    let calculate_start = function() {
+                        return (new Date(item.start) - Date.now() > 0) ?
+                        `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` :
+                        `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`;
+                    };
+                    let calculate_end = function() {
+                        return (new Date("2050") > new Date(item.end)) ?
+                        `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` :
+                        "永久開放";
+                    };
                     tippy(start, {
-                        content: (new Date(item.start) - Date.now() > 0) ? `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` : `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`
+                        onShow: function(ins) { ins.setContent(calculate_start()); }
                     });
                     tippy(end, {
-                        content: (new Date("2050") > new Date(item.end)) ? `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` : "永久開放"
+                        onShow: function(ins) { ins.setContent(calculate_end()); }
                     });
                 }
             });
@@ -192,7 +206,7 @@
                             if(item.detail.first_prize) {
                                 api.card.get(item.detail.first_prize)
                                 .then(data => {
-                                    let cont = "<b>大獎：</b><br>" + data[item.detail.first_prize].name;
+                                    let cont = `<b>大獎：</b><br><a class="text-white" href="./card?id=${data[item.detail.first_prize].id}">${data[item.detail.first_prize].name}</a><br>`;
                                     ins.setContent(cont);
                                 });
                             }
@@ -206,7 +220,7 @@
                             if(item.detail.special) {
                                 api.card.get(item.detail.special)
                                 .then(data => {
-                                    let cont = "<b>機率提升(+4.5%)：</b><br>" + data[item.detail.special].name;
+                                    let cont = `<b>機率提升(+4.5%)：</b><br><a class="text-white" href="./card?id=${data[item.detail.special].id}">${data[item.detail.special].name}</a><br>`;
                                     ins.setContent(cont);
                                 });
                             }
@@ -222,10 +236,10 @@
                         onShow: async_cont
                     });
                     tippy(start, {
-                        content: (new Date(item.start) - Date.now() > 0) ? `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` : `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`
+                        onShow: function(ins) { ins.setContent((new Date(item.start) - Date.now() > 0) ? `尚餘 ${moment.duration(new Date(item.start) - Date.now()).humanize()}開放` : `現已開放 ${moment.duration(new Date(item.start) - Date.now()).humanize()}`); }
                     });
                     tippy(end, {
-                        content: item.end ? `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` : "永久開放"
+                        onShow: function(ins) { ins.setContent(item.end ? `尚餘 ${moment.duration(new Date(item.end) - Date.now()).humanize()}關閉` : "永久開放"); }
                     });
                 }
             });
