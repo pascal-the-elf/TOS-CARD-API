@@ -187,6 +187,20 @@
                             });
                         }
                     }
+                    else if(item.type == "黑金封印卡活動") {
+                        async_cont = function(ins) {
+                            if(item.detail.first_prize) {
+                                api.card.get(item.detail.first_prize)
+                                .then(data => {
+                                    let cont = "<b>大獎：</b><br>" + data[item.detail.first_prize].name;
+                                    ins.setContent(cont);
+                                });
+                            }
+                            else {
+                                ins.setContent("黑金封印卡活動");
+                            }
+                        };
+                    }
                     else if(item.type == "封印卡活動") {
                         async_cont = function(ins) {
                             if(item.detail.special) {

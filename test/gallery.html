@@ -15,7 +15,12 @@
         window.params = {};
         let s = (new URL(location)).searchParams;
         for (let [k, v] of s) window.params[k] = v;
-        window.all_cards = window.api.card.all();
+        let sp = {};
+        if(params["attr"]) sp.attr = params["attr"];
+        if(params["race"]) sp.race = params["race"];
+        if(params["star"]) sp.star = params["star"];
+        if(!params["attr"] && !params["race"] && !params["star"]) sp = {star: "1,2,3,4,5,6,7,8"};
+        window.all_cards = window.api.card.search(sp);
     })();
     </script>
 </head>
