@@ -46,6 +46,102 @@
         </div>
         <div id="contents" class="container" style="display: none; max-width: 600px;">
             <br>
+            <div id="filter" class="filter jumbotron">
+                <h3 style="font-size: 1.4rem;">篩選條件</h3>
+                <hr class="my-1">
+                <div class="form-group">
+                    <span>屬性：</span><br>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-attr-1" checked>
+                        <label class="custom-control-label" for="filter-attr-1">水 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-attr-2" checked>
+                        <label class="custom-control-label" for="filter-attr-2">火 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-attr-3" checked>
+                        <label class="custom-control-label" for="filter-attr-3">木 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-attr-4" checked>
+                        <label class="custom-control-label" for="filter-attr-4">光 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-attr-5" checked>
+                        <label class="custom-control-label" for="filter-attr-5">暗 </label>
+                    </div>
+                    <br>
+
+                    <span>種族：</span><br>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-race-5" checked>
+                        <label class="custom-control-label" for="filter-race-5">神族 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-race-8" checked>
+                        <label class="custom-control-label" for="filter-race-8">魔族 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-race-1" checked>
+                        <label class="custom-control-label" for="filter-race-1">人類 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-race-2" checked>
+                        <label class="custom-control-label" for="filter-race-2">獸類 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-race-4" checked>
+                        <label class="custom-control-label" for="filter-race-4">龍類 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-race-3" checked>
+                        <label class="custom-control-label" for="filter-race-3">妖精類 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-race-9" checked>
+                        <label class="custom-control-label" for="filter-race-9">機械族 </label>
+                    </div>
+                    <br>
+
+                    <span>稀有度：</span><br>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-1" checked>
+                        <label class="custom-control-label" for="filter-star-1">1 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-2" checked>
+                        <label class="custom-control-label" for="filter-star-2">2 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-3" checked>
+                        <label class="custom-control-label" for="filter-star-3">3 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-4" checked>
+                        <label class="custom-control-label" for="filter-star-4">4 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-5" checked>
+                        <label class="custom-control-label" for="filter-star-5">5 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-6" checked>
+                        <label class="custom-control-label" for="filter-star-6">6 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-7" checked>
+                        <label class="custom-control-label" for="filter-star-7">7 </label>
+                    </div>
+                    <div class="filter-opt custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="filter-star-8" checked>
+                        <label class="custom-control-label" for="filter-star-8">8 </label>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <a class="btn btn-primary" href="javascript:search()" role="button">篩選</a>
+                </div>
+            </div>
             <div id="wrapper" style="width:100%; display: flex; flex-wrap: wrap; flex-direction: row; justify-content: flex-start; align-items: flex-start;"></div>
             <div id="end_pad" style="height: 200px;"></div>
         </div>
@@ -62,6 +158,7 @@
     (async function() {
         window.limit = 100;
         await init;
+        filter_check_sync();
         build();
     })();
 
@@ -132,11 +229,66 @@
                     wrap.appendChild(img);
                     document.getElementById("wrapper").appendChild(wrap);
                     if(window["release recollection"]) console.log("RELEASE RECOLLECTION!!!"+"!".repeat(Math.floor(Math.random()*5)));
-                    console.log("Card Built, ID: "+item.id);
+                    console.log("Card Placed, ID: "+item.id);
                     await cd();
                 }
             };
         }
+    }
+
+    function filter_check_sync() {
+        if(params["attr"]) {
+            let attr = Object.assign(...params["attr"].split(",").map(k => ({ [k]: true })));
+            for(let i = 1; i <= 5; i++) {
+                try {
+                    if(!attr[i]) document.getElementById("filter-attr-"+i).checked = false;
+                } catch(e) {}
+            }
+        }
+        if(params["race"]) {
+            let race = Object.assign(...params["race"].split(",").map(k => ({ [k]: true })));
+            for(let i = 1; i <= 10; i++) {
+                try {
+                    if(!race[i]) document.getElementById("filter-race-"+i).checked = false;
+                } catch(e) {}
+            }
+        }
+        if(params["star"]) {
+            let star = Object.assign(...params["star"].split(",").map(k => ({ [k]: true })));
+            for(let i = 1; i <= 8; i++) {
+                try {
+                    if(!star[i]) document.getElementById("filter-star-"+i).checked = false;
+                } catch(e) {}
+            }
+        }
+    }
+
+    async function search() {
+        let attr = [];
+        for(let i = 1; i <= 5; i++) {
+            try {
+                let input = document.getElementById("filter-attr-"+i);
+                if(input.checked) attr.push(i);
+            } catch(e) {}
+        }
+
+        let race = [];
+        for(let i = 1; i <= 10; i++) {
+            try {
+                let input = document.getElementById("filter-race-"+i);
+                if(input.checked) race.push(i);
+            } catch(e) {}
+        }
+
+        let star = [];
+        for(let i = 1; i <= 8; i++) {
+            try {
+                let input = document.getElementById("filter-star-"+i);
+                if(input.checked) star.push(i);
+            } catch(e) {}
+        }
+
+        location.href = `?attr=${attr.join(",")}&race=${race.join(",")}&star=${star.join(",")}`;
     }
     </script>
     <style>
@@ -178,6 +330,14 @@
     }
     .card_wrap > img {
         width: 100%
+    }
+    .filter {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    .filter-opt {
+        display: inline-block;
+        margin-right: 6px;
     }
     </style>
 </body>
