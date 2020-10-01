@@ -92,6 +92,9 @@
     <script>
     (async function() {
         await init;
+        document.getElementById("card_selector").addEventListener("click", function(e) {
+            if(e.target == this) this.style.display = "none";
+        });
         build();
     })();
 
