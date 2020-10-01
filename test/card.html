@@ -43,6 +43,10 @@
                         <a class="nav-link" href="./team">組隊預覽</a>
                     </li>
                 </ul>
+                <div class="form-inline my-2 my-lg-0">
+                    <input id="search_id" class="form-control mr-sm-2" type="number" placeholder="卡片 ID" style="max-width: 120px;">
+                    <button class="btn btn-primary my-2 my-sm-0" onclick="location.href='?id='+document.getElementById('search_id').value">查詢</button>
+                </div>
             </div>
         </nav>
         <br>
@@ -157,7 +161,7 @@
     async function build() {
         let data = await window.card;
 
-        if(data) {
+        if(data && data[params["id"]]) {
             Array.from(document.getElementsByClassName("card_name")).forEach((item, i) => {
                 item.innerHTML = data[params["id"]].name;
             });
@@ -310,6 +314,9 @@
             });
             document.getElementById("custom_level_input").max = data[params["id"]].table.length - 1;
             change_level_stats();
+        }
+        else {
+            location.href = "?id=1";
         }
         document.getElementById("loading").style.display = "none";
         document.getElementById("contents").style.display = "block";
