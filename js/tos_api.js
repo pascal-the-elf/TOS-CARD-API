@@ -71,12 +71,15 @@ function tos_api() {
             Object.entries(filters).forEach(pair => {
                 if(Array.isArray(pair[1])) filters[pair[0]] = pair[1].join(",");
             });
-            let params = new URLSearchParams(filters)
-            var response = await fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/search?" + params.toString()).then(r=>r.json());
-            if(response.info.success) {
-                console.log("成功向 API 搜尋卡片資料", response);
-                return response.data;
-            }
+            let params = new URLSearchParams(filters);
+            try {
+                var response = await fetch("https://tos-api.pascaltheelf.workers.dev/v1/card/search?" + params.toString()).then(r=>r.json());
+                if(response.info.success) {
+                    console.log("成功向 API 搜尋卡片資料", response);
+                    return response.data;
+                }
+                else throw new Error("向 API 搜尋卡片資料時發生未知錯誤");
+            } catch(err) { return Promise.reject(new Error("發生錯誤：" + err)) }
         },
         all: async function() {
             return self.card.search({star:[1,2,3,4,5,6,7,8]});
