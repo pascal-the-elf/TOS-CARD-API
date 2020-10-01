@@ -219,7 +219,7 @@
                             if(card.skills.active && card.skills.active.length) {
                                 text += `主動技能：<br>`;
                                 card.skills.active.forEach((item, i) => {
-                                    text += `<b>${item.name}</b><br>${item.effect.replace(/\n/g, " &nbsp; ")}<br><br>`;
+                                    text += `<b>${item.name}</b> <b style="color: orange; float: right;">${item.cd?"CD":"EP"} ${item.cd?item.cd.min:item.ep.min} / sLv ${item.cd?(item.cd.max-item.cd.min+1):(item.ep.max-item.ep.min+1)}</b><br>${item.effect.replace(/\n/g, " &nbsp; ")}<br><br>`;
                                 });
                             }
                             if(card.skills.leader && card.skills.leader.length) {
