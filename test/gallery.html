@@ -169,6 +169,7 @@
     (async function() {
         window.limit = 100;
         await init;
+        if(params["nav"] && params["nav"] == "none") document.getElementsByClassName("navbar")[0].style.display = "none";
         filter_check_sync();
         build();
     })();
@@ -238,6 +239,13 @@
                         onShow: async_cont
                     });
                     wrap.appendChild(img);
+                    if(params["selector"]) {
+                        let select = document.createElement("a");
+                        select.innerHTML = "選擇";
+                        select.href = `javascript:select(${item.id})`;
+                        select.classList.add("select_tag");
+                        wrap.appendChild(select);
+                    }
                     document.getElementById("wrapper").appendChild(wrap);
                     if(window["release recollection"]) console.log("RELEASE RECOLLECTION!!!"+"!".repeat(Math.floor(Math.random()*5)));
                     console.log("Card Placed, ID: "+item.id);
@@ -299,7 +307,17 @@
             } catch(e) {}
         }
 
-        location.href = `?attr=${attr.join(",")}&race=${race.join(",")}&star=${star.join(",")}`;
+        let des = `?attr=${attr.join(",")}&race=${race.join(",")}&star=${star.join(",")}`;
+        if(params["nav"]) des += `&nav=${params["nav"]}`;
+        if(params["session"]) des += `&session=${params["session"]}`;
+        if(params["selector"]) des += `&selector=${params["selector"]}`;
+        location.href = des;
+    }
+    function select(id=1) {
+        window.parent.postMessage({
+            session: params["session"],
+            card: id
+        }, "*");
     }
     </script>
     <style>
@@ -349,6 +367,16 @@
     .filter-opt {
         display: inline-block;
         margin-right: 6px;
+    }
+    .select_tag {
+        color: white;
+        background-color: rgba(0,0,0,.7);
+        padding: 1px 2px;
+        font-size: 1.2rem;
+        border-radius: 3px;
+    }
+    .select_tag:hover {
+        color: white;
     }
     </style>
 </body>

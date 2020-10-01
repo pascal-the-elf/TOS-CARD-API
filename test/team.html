@@ -18,6 +18,7 @@
         params["id"] = params["id"] ? params["id"] : "1";
         try { params["id"] = params["id"].split(",").splice(0,6); }
         catch(e) { params["id"] = [1,0,0,0,0,0]; }
+        while(params["id"].length < 6) params["id"].push(0);
         window.cards = window.api.card.get(params["id"]);
     })();
     </script>
@@ -75,6 +76,9 @@
                 </table>
             </div>
             <div id="leaders"></div>
+        </div>
+        <div id="card_selector" style="display: none; align-items: center; justify-content: center; position: fixed; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.6);">
+            <iframe id="card_selector_page" frameBorder="0" style="height: 90%; width: min(600px, 90%); border-radius: 5px;"></iframe>
         </div>
     </div>
 
@@ -153,6 +157,11 @@
                         maxWidth: 400
                     });
                 }
+                let edit_tag = document.createElement("a");
+                edit_tag.innerHTML = "編輯";
+                edit_tag.href = `javascript:edit(${i})`;
+                edit_tag.classList.add("edit_tag");
+                document.getElementsByClassName("card_img")[i].appendChild(edit_tag);
             });
             document.getElementById("hp").innerHTML = "隊伍血量：" + hp;
             document.getElementById("atk0").innerHTML = "水屬性攻擊力：" + attacks[0];
@@ -166,11 +175,20 @@
         document.getElementById("contents").style.display = "block";
     }
 
-    function compare_end(a, b) {
-        if(a.end && b.end) return new Date(a.end) - new Date(b.end);
-        if(a.end) return -1;
-        if(b.end) return 1;
-        return 0;
+    function edit(pos=0) {
+        let session = Date.now().toString();
+        document.getElementById("card_selector").style.display = "flex";
+        document.getElementById("card_selector_page").src = "./gallery.html?nav=none&selector=true&session="+session;
+        window.addEventListener("message", function(e) {
+            let data = e.data;
+            if(data.session == session) {
+                params["id"][pos] = data.card.toString();
+                let url = new URL(document.location);
+                url.searchParams.set("id", params["id"].join(","));
+                location.href = url.toString();
+            }
+            document.getElementById("card_selector").style.display = "none";
+        }, {once: true});
     }
     </script>
     <style>
@@ -213,6 +231,18 @@
     }
     .card_img > img {
         border-radius: 5.5%;
+    }
+    .edit_tag {
+        position: absolute;
+        right: 1px;
+        color: white;
+        background-color: rgba(0,0,0,.7);
+        padding: 1px 2px;
+        font-size: 0.7rem;
+        border-radius: 0 3px 0 2px;
+    }
+    .edit_tag:hover {
+        color: white;
     }
     </style>
 </body>
