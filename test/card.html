@@ -223,8 +223,8 @@
                     if(!i) block.classList.add("active", "show");
                     block.id = "active_skill_" + i;
                     info.classList.add("table");
-                    cd.innerHTML = `最小 ${item.cd?"CD":"EP"}：${item.cd?item.cd.min:item.ep.min}`;
-                    lvl.innerHTML = `最高技能等級：${item.cd?(item.cd.max-item.cd.min+1):(item.ep.max-item.ep.min+1)}`;
+                    try{ cd.innerHTML = `最小 ${item.cd?"CD":"EP"}：${item.cd?item.cd.min:item.ep.min}`; }catch(e){}
+                    try{ lvl.innerHTML = `最高技能等級：${item.cd?(item.cd.max-item.cd.min+1):(item.ep.max-item.ep.min+1)}`; }catch(e){}
                     effect.colSpan = "2";
                     effect.innerHTML += item.effect.replace(/\n/g, "<br>");
                     tr1.appendChild(cd);
