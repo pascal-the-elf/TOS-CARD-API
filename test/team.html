@@ -181,7 +181,7 @@
     function edit(pos=0) {
         let session = Date.now().toString();
         document.getElementById("card_selector").style.display = "flex";
-        document.getElementById("card_selector_page").src = "./gallery.html?nav=none&selector=true&session="+session;
+        document.getElementById("card_selector_page").src = "./gallery.html?nav=none&selector=true&autochecked=disabled&session="+session;
         window.addEventListener("message", function(e) {
             let data = e.data;
             if(data.session == session) {
