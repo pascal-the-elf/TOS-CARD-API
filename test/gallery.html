@@ -280,6 +280,14 @@
                 } catch(e) {}
             }
         }
+        if(params["autochecked"] == "disabled") {
+            let elms = document.getElementsByClassName("custom-control-input");
+            for(let i = 0; i <= elms.length; i++) {
+                try {
+                    elms[i].checked = false;
+                } catch(e) {}
+            }
+        }
     }
 
     async function search() {
