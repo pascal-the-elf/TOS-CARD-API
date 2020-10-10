@@ -299,7 +299,8 @@
                 });
             }
             Array.from(document.getElementsByClassName("card_thumbnail")).forEach((item, i) => {
-                item.src = data[params["id"]].image;
+                //item.src = data[params["id"]].image;
+                item.src = `https://web-assets.tosconfig.com/gallery/icons/${data[params["id"]].id.toString().padStart(4, "0")}.jpg`;
                 item.style.width = "100%";
             });
             let stats_max = Object.values(data[params["id"]].stats_max);
