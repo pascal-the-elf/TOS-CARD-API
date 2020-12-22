@@ -1,6 +1,8 @@
 # 神魔之塔卡片 API
 非官方卡片資訊 API
 
+**目前這個專案已停止更新，並整合至[TOS API 專案](https://github.com/pascal-the-elf/TOS-API)**
+
 ## 功能
 - 容易使用，快速上手
 - 多卡查詢（單一請求上限：6張）
